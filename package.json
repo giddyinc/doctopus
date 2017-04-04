@@ -35,6 +35,7 @@
     "babel-preset-react-hmre": "^1.1.1",
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.9.0",
+    "clarify": "^2.0.0",
     "del": "^2.0.2",
     "eslint": "^3.1.1",
     "eslint-config-xo-space": "^0.15.0",
@@ -59,5 +60,8 @@
     "test": "gulp",
     "test:watch": "gulp watch"
   },
-  "dependencies": {}
+  "dependencies": {
+    "joi-to-swagger": "^1.1.0",
+    "swagger-jsdoc": "^1.9.2"
+  }
 }

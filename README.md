@@ -29,8 +29,15 @@ $ npm install --save doctopus
 
 ```
 
+## Resources
+- [Helpful Tutorial](http://mherman.org/blog/2016/05/26/swagger-and-nodejs)
+- [swagger-jsdoc](https://github.com/Surnet/swagger-jsdoc) - annotation helper
+- [Official Swagger Documentation](http://swagger.io/docs/)
+
+
 ## Contributing
 We look forward to seeing your contributions!
+
 
 ## License
 
