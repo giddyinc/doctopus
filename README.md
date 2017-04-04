@@ -1,6 +1,14 @@
 # doctopus [![NPM version][npm-image]][npm-url] [![Build Status](https://travis-ci.org/giddyinc/doctopus.svg?branch=master)](https://travis-ci.org/giddyinc/doctopus) [![Dependency Status][daviddm-image]][daviddm-url] [![Coverage Status](https://coveralls.io/repos/github/giddyinc/doctopus/badge.svg?branch=master)](https://coveralls.io/github/giddyinc/doctopus?branch=master)
 
-> Swagger Documentation Generator
+Nobody likes writing docs. So to make it better, we wrote doctopus; a fluent pluggable Swagger spec builder enabling docs to be built quickly and maintained automatically.
+
+
+![alt tag](octopus1.jpg)
+
+The doctopus API provides heavy syntactic sugar over Swagger enabling re-use of common libraries and components for documentation composition.
+
+When used in conjuction with sister libraries doctopus faciliates schema reuse for persistence, validation, and documentation reducing maintenance overhead and increasing consistency.
+
 
 ## Installation
 

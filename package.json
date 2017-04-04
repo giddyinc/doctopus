@@ -62,7 +62,6 @@
     "test:watch": "gulp watch"
   },
   "dependencies": {
-    "joi-to-swagger": "^1.1.0",
-    "swagger-jsdoc": "^1.9.2"
+    "lodash": "^4.17.4"
   }
 }
