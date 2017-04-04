@@ -29,6 +29,34 @@ $ npm install --save doctopus
 
 ```
 
+#### Parameter Groups
+
+```js
+
+const group = {
+  accessToken: {
+    name: 'accessToken',
+    description: 'Client Token',
+    in: 'query',
+    required: false,
+    type: 'string'
+  },
+  fields: {
+    name: 'fields',
+    description: 'Fields you want returned',
+    in: 'query',
+    required: false,
+    type: 'string'
+  }
+};
+
+doctopus.paramGroup('public', group);
+
+// later
+Doc.paramGroup('public');
+
+```
+
 ## Resources
 - [Helpful Tutorial](http://mherman.org/blog/2016/05/26/swagger-and-nodejs)
 - [swagger-jsdoc](https://github.com/Surnet/swagger-jsdoc) - annotation helper
