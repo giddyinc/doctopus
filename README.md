@@ -10,10 +10,7 @@ $ npm install --save doctopus
 
 ## Overview
 
-TBD
-
-There are 4 components.
-
+Way more documentation to come.
 
 ## Installation 
 
