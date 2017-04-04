@@ -21,11 +21,86 @@ There are 4 components.
 $ npm install --save doctopus
 ```
 
-## Usage
+### Example Configuration
+```js
+
+const app = require('express')();
+const doctopus = require('doctopus');
+
+const docs = new doctopus.DocBuilder();
+const docFactory = new doctopus.Doc();
+
+docs.set('title', 'My Express App');
+
+docs.add('/swagger', docFactory.get()
+    .group('Documentation')
+    .description('Gets a Swagger Specification')
+    .summary('Swagger')
+    .onSuccess(200, {
+        description: 'Swagger Spec',
+        schema: Doc.object()
+    })
+    .build());
+
+app.get('/swagger', (req, res) => res.send(docs.build()));
+app.listen('3000');
+
+```
+
+## Advanced Usage
+
+Doctopus was designed with automation and re-usability in mind. To leverage automatic doc generation, we recommend using two packages that we've found to be helpful. 
+
+
+- [joi-to-swagger](https://www.npmjs.com/package/joi-to-swagger) - Joi Validation Object to Swagger Mapper
+  - For API inputs, joi is an excellent validation framework which can help define sync endpoint validation and with doctopus, you can also define your documentation using the same schemas.
+- [mongoose-to-swagger](https://www.npmjs.com/package/mongoose-to-swagger) - Mongoose Model to Swagger Mapper
+  - For API outputs, often times API endpoints simply return JSON representations of mongoose models.
+  Doctopus allows you to simply reference the mongoose model (Doc.model('name')) and have the swagger schema automatically generated.
+
+After you've registered your mongoose models...
 
 ```js
 
-'use strict';
+const joi = require('joi');
+const j2s = require('joi-to-swagger');
+const m2s = require('mongoose-to-swagger');
+
+// ...
+
+const docs = new doctopus.DocBuilder();
+const definitions = {
+  // you can define custom definitions in line or reference from another file if you choose
+  'Cat': {
+      'id': 'Cat',
+      'properties': {
+          'name': {
+              'type': 'string'
+          }
+      }
+  }
+};
+
+// automatically register // namespace all mongoose models
+for(const i in mongoose.models) {
+    definitions[`mongoose|${i}`] = m2s(mongoose.models[i]);
+}
+
+const joiSchemas = {
+    Cat: joi.object().keys({
+      name: joi.string()
+    })
+};
+
+Object.keys(joiSchemas).forEach(k => {
+    definitions[`joi|${k}`] = j2s(joiSchemas[k]).swagger;
+});
+
+// enable Reflection in doctopus api (Doc.pick('RegisteredModel', 'Property')))
+doctopus.Doc.setDefinitions(definitions);
+
+// add definitions to swagger definitions
+docs.addDefinitions(definitions);
 
 ```
 
