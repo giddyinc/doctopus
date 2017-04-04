@@ -1,7 +1,7 @@
 {
   "name": "doctopus",
   "version": "0.0.0",
-  "description": "Opinionated OpenAPI Specification Bridge to common Node.js libraries.",
+  "description": "Fluent & Pluggable Swagger Specification Builder",
   "homepage": "",
   "author": {
     "name": "Ben Lugavere",
@@ -17,13 +17,15 @@
     "openapi",
     "doc",
     "docs",
-    "documentation"
+    "documentation",
+    "express",
+    "api",
+    "apis"
   ],
   "devDependencies": {
     "babel-core": "^6.11.4",
     "babel-eslint": "^7.0.0",
     "babel-loader": "^6.2.5",
-    "babel-plugin-array-includes": "^2.0.3",
     "babel-plugin-transform-class-properties": "^6.11.5",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-plugin-transform-object-assign": "^6.8.0",
