@@ -7,7 +7,7 @@ const Doc = doctopus.Doc;
 const DocBuilder = doctopus.DocBuilder;
 
 /**
- * mocha --require babel-register test --watch
+ * mocha test --watch
  */
 
 describe('doctopus', function () {

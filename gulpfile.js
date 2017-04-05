@@ -8,16 +8,11 @@ var istanbul = require('gulp-istanbul');
 var nsp = require('gulp-nsp');
 var plumber = require('gulp-plumber');
 var coveralls = require('gulp-coveralls');
-var babel = require('gulp-babel');
 var del = require('del');
 var isparta = require('isparta');
 
-// Initialize the babel transpiler so ES2015 files gets compiled
-// when they're loaded
-require('babel-register')();
-
 gulp.task('static', function () {
-  return gulp.src('**/*.js')
+  return gulp.src(['**/*.js'])
     .pipe(excludeGitignore())
     .pipe(eslint())
     .pipe(eslint.format())
@@ -58,15 +53,9 @@ gulp.task('coveralls', ['test'], function () {
     .pipe(coveralls());
 });
 
-gulp.task('babel', ['clean'], function () {
-  return gulp.src('lib/**/*.js')
-    .pipe(babel())
-    .pipe(gulp.dest('dist'));
-});
-
 gulp.task('clean', function () {
   return del('dist');
 });
 
-gulp.task('prepublish', ['nsp', 'babel']);
+gulp.task('prepublish', ['nsp']);
 gulp.task('default', ['static', 'test', 'coveralls']);
