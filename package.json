@@ -43,8 +43,9 @@
   "repository": "giddyinc/doctopus",
   "scripts": {
     "prepublish": "gulp prepublish",
-    "test": "gulp",
-    "test:watch": "gulp watch"
+    "test": "gulp && npm run lint",
+    "test:watch": "gulp watch",
+    "lint": "./node_modules/.bin/eslint ./lib"
   },
   "dependencies": {
     "lodash": "^4.17.4"
