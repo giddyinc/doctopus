@@ -119,9 +119,9 @@ export class DocBuilder {
 export const options: {
 };
 
-export function get(key: any, value: any, ...args: any[]): any;
+export function get(key: string, value: any, ...args: any[]): any;
 
-export function paramGroup(name: any, schema: any): any;
+export function paramGroup(name: string, schema: any): any;
 
-export function set(key: any, value: any, ...args: any[]): any;
+export function set(key: string, value: any, ...args: any[]): any;
 
