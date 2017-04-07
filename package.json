@@ -9,7 +9,8 @@
     "url": "http://benlugavere.com/"
   },
   "files": [
-    "dist"
+    "dist",
+    "doctopus.d.ts"
   ],
   "main": "dist/index.js",
   "keywords": [

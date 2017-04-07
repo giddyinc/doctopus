@@ -3,7 +3,7 @@
 export class Doc {
     constructor(doc: any);
 
-    add(key: any, val: any): any;
+    add(key: string, val: any): any;
 
     bodyParam(obj: any): any;
 
@@ -19,7 +19,7 @@ export class Doc {
 
     get(): any;
 
-    group(txt: any): any;
+    group(txt: string): any;
 
     html(): any;
 
@@ -53,7 +53,7 @@ export class Doc {
 
     setParams(arr: any): any;
 
-    summary(txt: any): any;
+    summary(txt: string): any;
 
     tags(arr: any): any;
 
@@ -98,9 +98,9 @@ export class Doc {
 export class DocBuilder {
     constructor(docs: any);
 
-    add(path: any, doc: any): void;
+    add(path: string, doc: any): void;
 
-    addDefinition(path: any, doc: any): void;
+    addDefinition(path: string, doc: any): void;
 
     addDefinitions(obj: any): void;
 
@@ -112,7 +112,7 @@ export class DocBuilder {
 
     getFactory(namespace: any, modelName: any): any;
 
-    set(key: any, value: any, ...args: any[]): any;
+    set(key: string, value: any, ...args: any[]): any;
 
 }
 
