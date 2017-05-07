@@ -20,6 +20,8 @@ $ npm install --save doctopus
 
 Way more documentation to come.
 
+It is important to note that doctopus implements a mutable API enabling reuse of common variables and parameters to make documenting common routes easier. It is recommended to create a single instance per route file and clear params (`doc.clearParams()`) when they change. 
+
 ## Installation 
 
 ```sh
