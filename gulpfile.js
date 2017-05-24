@@ -36,7 +36,7 @@ gulp.task('pre-test', function () {
 gulp.task('test', ['pre-test'], function () {
   return gulp.src(['lib/**/*.test.js', 'test/**/*.js'])
     .pipe(plumber())
-    .pipe(mocha({reporter: 'nyan'}))
+    .pipe(mocha({reporter: 'dot'}))
     .pipe(istanbul.writeReports());
 });
 
@@ -54,7 +54,10 @@ gulp.task('coveralls', ['test'], function () {
 });
 
 gulp.task('babel', ['clean'], function () {
-  return gulp.src('lib/**/*.js')
+  return gulp.src([
+    'lib/**/*.js',
+    '!lib/**/*.test.js'
+  ])
     .pipe(gulp.dest('dist'));
 });
 
