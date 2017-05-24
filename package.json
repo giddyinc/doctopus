@@ -1,6 +1,6 @@
 {
   "name": "doctopus",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Fluent & Pluggable Swagger Specification Builder",
   "homepage": "",
   "author": {
@@ -9,7 +9,8 @@
     "url": "http://benlugavere.com/"
   },
   "files": [
-    "dist"
+    "dist",
+    "doctopus.d.ts"
   ],
   "main": "dist/index.js",
   "keywords": [
@@ -43,10 +44,12 @@
   "repository": "giddyinc/doctopus",
   "scripts": {
     "prepublish": "gulp prepublish",
-    "test": "gulp",
-    "test:watch": "gulp watch"
+    "test": "gulp && npm run lint",
+    "test:watch": "gulp watch",
+    "lint": "./node_modules/.bin/eslint ./lib"
   },
   "dependencies": {
     "lodash": "^4.17.4"
-  }
+  },
+  "typings": "doctopus.d.ts"
 }
