@@ -1,4 +1,6 @@
 
+'use strict';
+
 var path = require('path');
 var gulp = require('gulp');
 var eslint = require('gulp-eslint');
@@ -28,14 +30,21 @@ gulp.task('nsp', function (cb) {
   nsp({package: path.resolve('package.json')}, cb);
 });
 
-gulp.task('pre-test', function () {
+gulp.task('pre-test', cb => {
+  let mochaErr;
   return gulp.src(['lib/**/*.js', '!lib/**/*.test.js'])
     .pipe(excludeGitignore())
     .pipe(istanbul({
       includeUntested: true,
       instrumenter: isparta.Instrumenter
     }))
-    .pipe(istanbul.hookRequire());
+    .on('error', function (err) {
+      mochaErr = err;
+    })
+    .pipe(istanbul.writeReports())
+    .on('end', function () {
+      cb(mochaErr);
+    });
 });
 
 gulp.task('test', ['pre-test'], function () {
