@@ -10,12 +10,18 @@ const DocBuilder = doctopus.DocBuilder;
  */
 
 describe('doctopus', () => {
+  it('options', () => {
+    doctopus.set('foo', 'bar');
+    expect(doctopus.set('foo')).toEqual('bar');
+    expect(doctopus.get('foo')).toEqual('bar');
+  });
   describe('export', () => {
     let docs;
     beforeEach(() => {
       // doctopus
       docs = new DocBuilder();
     });
+
     it('should do', () => {
       const docFactory = new Doc()
         .group('Cats')
@@ -30,9 +36,12 @@ describe('doctopus', () => {
         })
         .build());
 
-      const endResult = docs.build();
-      expect(endResult.info).toExist();
-      expect(endResult.paths).toExist();
+      return docs.build().then(endResult => {
+        expect(endResult.info).toExist();
+        expect(endResult.paths).toExist();
+        expect(endResult.paths['/v1/cats'].get).toExist();
+        // console.log(endResult);
+      });
     });
   });
 
@@ -86,18 +95,19 @@ describe('doctopus', () => {
       .build());
 
     setTimeout(() => {
-      const result = docs.build();
-      expect(result.info).toExist();
-      const paths = result.paths;
-      expect(paths['/cats']).toExist('/cats');
-      expect(paths['/cats/{id}']).toExist('/cats/{id}');
-      expect(paths['/cats'].get).toExist();
-      expect(paths['/cats'].post).toExist();
-      expect(paths['/cats'].get.tags).toExist('tags');
-      // console.log('ALL PATHS', paths);
-      expect(paths['/cats/{id}']).toExist('/cats/{id}');
-      expect(paths['/cats/{id}'].get.parameters[0].name).toEqual('id');
-      done();
+      docs.build().then(result => {
+        expect(result.info).toExist();
+        const paths = result.paths;
+        expect(paths['/cats']).toExist('/cats');
+        expect(paths['/cats/{id}']).toExist('/cats/{id}');
+        expect(paths['/cats'].get).toExist();
+        expect(paths['/cats'].post).toExist();
+        expect(paths['/cats'].get.tags).toExist('tags');
+        // console.log('ALL PATHS', paths);
+        expect(paths['/cats/{id}']).toExist('/cats/{id}');
+        expect(paths['/cats/{id}'].get.parameters[0].name).toEqual('id');
+        done();
+      });
     }, 100);
 
     // }, 100);

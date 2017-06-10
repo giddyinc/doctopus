@@ -31,6 +31,7 @@ gulp.task('nsp', cb => {
 
 gulp.task('pre-test', () => gulp.src([
   'lib/**/*.js',
+  'test/**/*.js',
   '!lib/**/*.test.js'
 ])
     .pipe(excludeGitignore())
