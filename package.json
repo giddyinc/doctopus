@@ -62,6 +62,7 @@
     "test:watch": "gulp watch"
   },
   "dependencies": {
+    "auto-bind": "1.1.0",
     "lodash": "^4.17.4"
   }
 }
