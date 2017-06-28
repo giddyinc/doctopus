@@ -10,7 +10,7 @@ const DocBuilder = doctopus.DocBuilder;
  * mocha test --watch
  */
 
-describe('doctopus', function () {
+describe('doctopus', () => {
   describe('export', () => {
     let docs;
     beforeEach(() => {

@@ -1,0 +1,7 @@
+*.test.js
+test
+lib
+.vscode
+octopus1.jpg
+.editorconfig
+*.test.js
