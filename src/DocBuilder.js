@@ -1,6 +1,6 @@
 'use strict';
 
-const _ = require('lodash');
+const cloneDeep = require('lodash.clonedeep');
 const autoBind = require('auto-bind');
 const Doc = require('./Doc');
 
@@ -76,7 +76,7 @@ class DocBuilder {
       spec.host = self.options.host;
     }
 
-    return _.cloneDeep(spec);
+    return cloneDeep(spec);
   }
 
   /**

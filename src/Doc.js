@@ -1,6 +1,7 @@
 'use strict';
 
-const _ = require('lodash');
+const autoBind = require('auto-bind');
+const cloneDeep = require('lodash.clonedeep');
 const paramGroups = require('./paramGroups');
 let definitions = {};
 
@@ -16,33 +17,8 @@ class Doc {
 
     this.modelName = 'Resource';
 
-    this.setModel = this.setModel.bind(this);
-    this.add = this.add.bind(this);
-    this.json = this.json.bind(this);
-    this.csv = this.csv.bind(this);
-    this.html = this.html.bind(this);
-    this.description = this.description.bind(this);
-    this.summary = this.summary.bind(this);
-    this.group = this.group.bind(this);
-    this.tags = this.tags.bind(this);
-    this.operationId = this.operationId.bind(this);
-    this.innerDoc = this.innerDoc.bind(this);
-    this.get = this.get.bind(this);
-    this.post = this.post.bind(this);
-    this.put = this.put.bind(this);
-    this.delete = this.delete.bind(this);
-    this.build = this.build.bind(this);
-    this.setMethod = this.setMethod.bind(this);
-
     // params
-    this.setParams = this.setParams.bind(this);
-    this.param = this.param.bind(this);
-    this.removeParam = this.removeParam.bind(this);
-    this.idParam = this.idParam.bind(this);
-    this.bodyParam = this.bodyParam.bind(this);
-    this.modelBody = this.modelBody.bind(this);
-    this.clearParams = this.clearParams.bind(this);
-    this.paramGroup = this.paramGroup.bind(this);
+    autoBind(this);
     this.json(); // default
   }
 
@@ -63,7 +39,7 @@ class Doc {
   paramGroup(name) {
     const schema = paramGroups[name];
     if (schema) {
-      _.values(schema).forEach(param => this.param(param));
+      Object.keys(schema).map(x => schema[x]).forEach(param => this.param(param));
     }
     return this;
   }
@@ -282,8 +258,9 @@ class Doc {
   }
 
   build() {
-    this.setParams(_.values(this._params));
-    return _.cloneDeep(this.doc);
+    const params = Object.keys(this._params).map(x => this._params[x]);
+    this.setParams(params);
+    return cloneDeep(this.doc);
   }
 
   onSuccessUseUtil(code, result) {
@@ -318,7 +295,7 @@ class Doc {
       obj.responses = {};
     }
 
-    obj.responses[code] = _.cloneDeep(result);
+    obj.responses[code] = cloneDeep(result);
 
     if (useUtil) {
       obj.responses[code].schema = {
@@ -389,7 +366,7 @@ Doc.withParamGroup = function (name, arg) {
   if (!group) {
     return {};
   }
-  _.values(group).forEach(x => {
+  Object.keys(group).map(x => group[x]).forEach(x => {
     arg.properties[x.name] = {
       type: x.type
     };
