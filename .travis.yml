@@ -1,5 +1,10 @@
+sudo: false
 language: node_js
+cache:
+  directories:
+  - node_modules
 node_js:
   - v6
   - v5
   - v4
+after_success: make coverage

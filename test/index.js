@@ -1,7 +1,7 @@
 
 'use strict';
 
-const doctopus = require('../lib');
+const doctopus = require('..');
 const expect = require('expect');
 const Doc = doctopus.Doc;
 const DocBuilder = doctopus.DocBuilder;
