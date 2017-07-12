@@ -1,13 +1,8 @@
 module.exports = {
   "extends": "xo-space",
   "env": {
-    "mocha": true
-  },
-  "parserOptions": {
-    "ecmaFeatures": {
-      "experimentalObjectRestSpread": true,
-    },
-    "sourceType": "module"
+    "mocha": true,
+    "node": true
   },
   "rules": {
     "guard-for-in": [0],
