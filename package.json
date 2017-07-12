@@ -35,7 +35,6 @@
   },
   "repository": "giddyinc/doctopus",
   "scripts": {
-    "prepublish": "gulp prepublish",
     "test": "make test"
   },
   "dependencies": {
