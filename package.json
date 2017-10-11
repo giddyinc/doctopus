@@ -44,11 +44,11 @@
   "repository": "giddyinc/doctopus",
   "scripts": {
     "prepublish": "gulp prepublish",
-    "test": "gulp && npm run lint",
-    "test:watch": "gulp watch",
-    "lint": "./node_modules/.bin/eslint ./lib"
+    "test": "make test",
+    "test:watch": "gulp watch"
   },
   "dependencies": {
+    "auto-bind": "^1.1.0",
     "lodash": "^4.17.4"
   },
   "typings": "doctopus.d.ts"
