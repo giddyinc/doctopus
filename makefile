@@ -1,5 +1,5 @@
 
-.PHONY: test
+.PHONY: test docs
 
 clean:
 	rm -rf .nyc_output coverage dist
@@ -9,3 +9,7 @@ lint:
 
 test: lint
 	./node_modules/.bin/gulp
+
+docs:
+	jsdoc ./lib -r
+	open ./out/index.html

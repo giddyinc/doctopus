@@ -1,7 +1,12 @@
-# doctopus [![NPM version][npm-image]][npm-url] [![Build Status](https://travis-ci.org/giddyinc/doctopus.svg?branch=master)](https://travis-ci.org/giddyinc/doctopus) [![Dependency Status][daviddm-image]][daviddm-url] [![Coverage Status](https://coveralls.io/repos/github/giddyinc/doctopus/badge.svg?branch=master)](https://coveralls.io/github/giddyinc/doctopus?branch=master)
+
+[![NPM version][npm-image]][npm-url]
+[![Build Status][travis-image]][travis-url]
+[![Dependency Status][daviddm-image]][daviddm-url]
+[![Coverage Status][coveralls-image]][coveralls-url]
+
+# doctopus
 
 Nobody likes writing docs. So to make it better, we wrote doctopus; a fluent pluggable Swagger spec builder enabling docs to be built quickly and maintained automatically.
-
 
 ![alt tag](octopus1.jpg)
 
@@ -9,6 +14,11 @@ The doctopus API provides heavy syntactic sugar over Swagger enabling re-use of 
 
 When used in conjuction with sister libraries doctopus faciliates schema reuse for persistence, validation, and documentation reducing maintenance overhead and increasing consistency.
 
+## Overview
+
+Way more documentation to come.
+
+It is important to note that doctopus implements a mutable API enabling reuse of common variables and parameters to make documenting common routes easier. It is recommended to create a single instance per route file and clear params (`doc.clearParams()`) when they change. 
 
 ## Installation
 
@@ -16,19 +26,8 @@ When used in conjuction with sister libraries doctopus faciliates schema reuse f
 $ npm install --save doctopus
 ```
 
-## Overview
-
-Way more documentation to come.
-
-It is important to note that doctopus implements a mutable API enabling reuse of common variables and parameters to make documenting common routes easier. It is recommended to create a single instance per route file and clear params (`doc.clearParams()`) when they change. 
-
-## Installation 
-
-```sh
-$ npm install --save doctopus
-```
-
 ### Example Configuration
+
 ```js
 
 const app = require('express')();
