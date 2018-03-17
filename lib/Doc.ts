@@ -336,6 +336,7 @@ class Doc {
       required: true,
       type: 'string',
     });
+
     return this;
   }
 
@@ -441,7 +442,7 @@ class Doc {
    * @param {string} txt - Text to set Description to.
    * @returns {Doc} - Doc Instance.
    */
-  public description(txt: string) {
+  public description(txt: string): this {
     this.innerDoc().description = txt || '';
     return this;
   }
@@ -462,7 +463,7 @@ class Doc {
    * @param {string} txt - Text to set operationId to
    * @returns {Doc} - Doc Instance
    */
-  public operationId(txt) {
+  public operationId(txt: string) {
     this.innerDoc().operationId = txt || '';
     return this;
   }
@@ -517,21 +518,22 @@ class Doc {
    * @param {string} methodName - Method Name
    * @returns {Doc} - Doc Instance
    */
-  public setMethod(methodName) {
-    if (Object.keys(this.doc).length === 0) {
-      this.doc[methodName] = {};
+  public setMethod(methodName: string) {
+    const { doc } = this;
+    if (Object.keys(doc).length === 0) {
+      doc[methodName] = {};
     } else {
-      const old = Object.keys(this.doc)[0];
+      const old = Object.keys(doc)[0];
       if (methodName === old) {
         return this;
       }
-      this.doc[methodName] = this.doc[old];
-      delete this.doc[old];
+      doc[methodName] = doc[old];
+      delete doc[old];
     }
     return this;
   }
 
-  public add(key, val) {
+  public add(key: string, val) {
     const obj = this.innerDoc();
     obj[key] = val;
     return this;
@@ -584,7 +586,7 @@ class Doc {
     return _.cloneDeep(this.doc);
   }
 
-  public onSuccessUseUtil(code, result) {
+  public onSuccessUseUtil(code: number, result) {
     return this.onSuccess(code, result, true);
   }
 
@@ -602,7 +604,7 @@ class Doc {
   }
 
   // Response
-  public onSuccess(code, result, useUtil?) {
+  public onSuccess(code, result, useUtil?: boolean) {
     // response code optional
     if (typeof code === 'object') {
       useUtil = result;
