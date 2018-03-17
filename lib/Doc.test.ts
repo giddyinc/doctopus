@@ -19,7 +19,7 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
 
   before(() => {
     doc = new Doc({
-      post: {}
+      post: {},
     });
 
     doctopus.paramGroup('foo', {
@@ -28,8 +28,8 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
         description: 'wohoo',
         in: 'query',
         required: false,
-        type: 'string'
-      }
+        type: 'string',
+      },
     });
   });
 
@@ -47,15 +47,15 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
 
   const formats = [{
     input: 'json',
-    output: 'application/json'
+    output: 'application/json',
   }, {
     input: 'html',
-    output: 'text/html'
+    output: 'text/html',
   }, {
     input: 'csv',
-    output: 'text/csv'
+    output: 'text/csv',
   }];
-  formats.forEach(f => {
+  formats.forEach((f) => {
     describe(f.input, () => {
       it(`should be able to make it produce ${f.input}`, () => {
         doc[f.input]();
@@ -74,17 +74,17 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
         items: {
           properties: {
             numCodes: {
-              type: 'number'
-            }
-          }
-        }
-      }
+              type: 'number',
+            },
+          },
+        },
+      },
     };
     const objResponse = {
       description,
       schema: {
-        $ref: '#/definitions/Cat'
-      }
+        $ref: '#/definitions/Cat',
+      },
     };
     it('array', () => {
       doc.onSuccess(200, arrayResponse);
@@ -130,7 +130,7 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
     });
   });
 
-  ['tags', 'description', 'summary', 'operationId'].forEach(x => {
+  ['tags', 'description', 'summary', 'operationId'].forEach((x) => {
     it(`should be able to set ${x}`, () => {
       doc[x]('foo');
       expect(doc.doc.post[x]).toEqual('foo');
@@ -144,17 +144,17 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
 
   it('should be able to set group', () => {
     doc.param({
-      name: 'foo'
+      name: 'foo',
     });
     expect(doc._params.foo).toExist();
     doc.removeParam({
-      name: 'foo'
+      name: 'foo',
     });
     expect(doc._params.foo).toNotExist();
   });
 
   describe('setMethod', () => {
-    ['get', 'post', 'put', 'patch', 'delete'].forEach(method => {
+    ['get', 'post', 'put', 'patch', 'delete'].forEach((method) => {
       it(method, () => {
         doc[method]();
         const result = doc.build();
@@ -179,7 +179,7 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
   });
 
   describe('params', () => {
-    ['param', 'bodyParam'].forEach(x => {
+    ['param', 'bodyParam'].forEach((x) => {
       it('should throw if invalid', () => {
         const run = () => doc[x]('foo');
         expect(run).toThrow(Error);
@@ -212,7 +212,7 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
         doc.idParam();
         const result = doc.build();
         expect(doc._params.id).toExist();
-        const param = result.delete.parameters.find(x => x.name === 'id');
+        const param = result.delete.parameters.find((x) => x.name === 'id');
         expect(param).toExist();
         expect(param.description).toEqual('Resource Id');
       });
@@ -221,7 +221,7 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
         doc.idParam('invoiceId');
         const result = doc.build();
         expect(doc._params.invoiceId).toExist();
-        const param = result.delete.parameters.find(x => x.name === 'invoiceId');
+        const param = result.delete.parameters.find((x) => x.name === 'invoiceId');
         expect(param).toExist();
         expect(param.description).toEqual('Resource Id');
       });
@@ -231,7 +231,7 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
         doc.idParam();
         const result = doc.build();
         expect(doc._params.id).toExist();
-        const param = result.delete.parameters.find(x => x.name === 'id');
+        const param = result.delete.parameters.find((x) => x.name === 'id');
         expect(param).toExist();
         expect(param.description).toEqual(`${model} Id`);
       });
@@ -241,7 +241,7 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
         doc.idParam('catId', model);
         const result = doc.build();
         expect(doc._params.invoiceId).toExist();
-        const param = result.delete.parameters.find(x => x.name === 'catId');
+        const param = result.delete.parameters.find((x) => x.name === 'catId');
         expect(param).toExist();
         expect(param.description).toEqual(`${model} Id`);
       });
@@ -263,7 +263,7 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
       expect(result.type === 'array');
       expect(result.items.type === 'string');
     });
-    ['object', 'string', 'number'].forEach(x => {
+    ['object', 'string', 'number'].forEach((x) => {
       it(x, () => {
         const result = Doc[x]();
         expect(result.type === x);
@@ -284,8 +284,8 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
     it('inlineObj', () => {
       const result = Doc.inlineObj({
         foo: {
-          type: 'bar'
-        }
+          type: 'bar',
+        },
       });
       expect(result.properties.foo.type === 'bar');
     });
@@ -311,7 +311,7 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
 
     it('withParamGroup', () => {
       const result = Doc.withParamGroup('foo', Doc.inlineObj({
-        type: 'string'
+        type: 'string',
       }));
       expect(result.properties).toExist();
       expect(result.properties.type === 'string');
@@ -331,8 +331,8 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
     const definition = {
       foo: {
         id: 'foo',
-        properties: {}
-      }
+        properties: {},
+      },
     };
 
     it('should set', () => {
@@ -345,13 +345,13 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
   describe('extend', () => {
     it('should extend', () => {
       const result = Doc.extend('foo', {
-        bar: Doc.string()
+        bar: Doc.string(),
       });
       expect(result.properties.bar).toExist();
     });
     it('should extend if it doesn\'t exist', () => {
       const result = Doc.extend('baz', {
-        barry: Doc.string()
+        barry: Doc.string(),
       });
       expect(result.properties.barry).toExist();
     });
@@ -360,35 +360,35 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
     const defs = {
       Cat: {
         properties: {
-          claws: {
+          'claws': {
             properties: {
               sharpness: {
-                type: 'string'
-              }
-            }
+                type: 'string',
+              },
+            },
           },
           'eye.color': {
             properties: {
               brightness: {
-                type: 'number'
-              }
-            }
-          }
-        }
-      }
+                type: 'number',
+              },
+            },
+          },
+        },
+      },
     };
     beforeEach(() => Doc.setDefinitions(defs));
 
     it('should return a default', () => {
       const result = Doc.pick('baz');
-      expect(result).toExist()
-      console.log(result);
+      expect(result).toExist();
+      // console.log(result);
     });
 
     it('should return some clawz', () => {
       const result = Doc.pick('Cat', 'claws');
       expect(result).toExist();
-      expect(result.properties.sharpness).toExist();
+      expect((result.properties as any).sharpness).toExist();
     });
 
     it('should return some nested props', () => {

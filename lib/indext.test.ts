@@ -1,7 +1,7 @@
 
 'use strict';
 
-import  _ from 'lodash';
+import _ from 'lodash';
 import path from 'path';
 import expect from 'expect';
 import sinon from 'sinon';
@@ -9,8 +9,8 @@ import doctopus from '.';
 import paramGroups from './paramGroups';
 
 /**
-* mocha ./lib/indext.test.ts --opts .mocharc --watch
-*/
+ * mocha ./lib/indext.test.ts --opts .mocharc --watch
+ */
 
 describe(path.basename(__filename).replace('.test.js', ''), () => {
   let sandbox;
@@ -21,7 +21,7 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
   afterEach(() => {
     sandbox.restore();
     doctopus.options = {};
-    Object.keys(paramGroups).forEach(x => {
+    Object.keys(paramGroups).forEach((x) => {
       delete paramGroups[x];
     });
   });

@@ -1,9 +1,9 @@
 'use strict';
 
+import autoBind from 'auto-bind';
 import _ from 'lodash';
 import Doc from './Doc';
-import autoBind from 'auto-bind';
-import { Spec } from 'swagger-schema-official';
+import { Spec, Path } from 'swagger-schema-official';
 
 /**
  * @class
@@ -20,7 +20,7 @@ class DocBuilder {
     this.options = {};
   }
 
-  set(key, value) {
+  public set(key, value) {
     if (arguments.length === 1) {
       return this.options[key];
     }
@@ -29,18 +29,18 @@ class DocBuilder {
     return this;
   }
 
-  get(key) {
+  public get(key) {
     return this.options[key];
   }
 
-  addDefinitions(obj) {
+  public addDefinitions(obj) {
     const self = this;
-    Object.keys(obj).forEach(k => {
+    Object.keys(obj).forEach((k) => {
       self.addDefinition(k, obj[k]);
     });
   }
 
-  addDefinition(path, doc) {
+  public addDefinition(path: string, doc) {
     const self = this;
     if (!self.definitions[path]) {
       self.definitions[path] = {};
@@ -48,7 +48,7 @@ class DocBuilder {
     Object.assign(self.definitions[path], doc);
   }
 
-  add(path, doc) {
+  public add(path: string, doc: Path) {
     const self = this;
     if (!self.docs[path]) {
       self.docs[path] = {};
@@ -56,19 +56,19 @@ class DocBuilder {
     Object.assign(self.docs[path], doc);
   }
 
-  build(): Spec {
+  public build(): Spec {
     const { definitions, docs, options } = this;
     const spec: Spec = {
+      definitions,
+      host: '',
       info: {
         title: options.title || 'Title', // Title (required)
-        version: options.version || '1.0.0' // Version (required)
+        version: options.version || '1.0.0', // Version (required)
       },
-      tags: [],
-      swagger: '2.0',
-      securityDefinitions: {},
       paths: docs,
-      definitions: definitions,
-      host: ''
+      securityDefinitions: {},
+      swagger: '2.0',
+      tags: [],
     };
 
     if (options.host) {
@@ -82,7 +82,7 @@ class DocBuilder {
    * Clears the cached docs.
    * @returns {void}
    */
-  clear() {
+  public clear(): void {
     this.docs = {};
   }
 
@@ -92,7 +92,7 @@ class DocBuilder {
    * @param {string} modelName - Mongoose Model Name
    * @returns {Doc} - Doc Factory Instance
    */
-  getFactory(namespace, modelName: string) {
+  public getFactory(namespace, modelName: string) {
     const factory = new Doc();
     factory.group(namespace);
     if (modelName) {

@@ -1,29 +1,30 @@
 
 'use strict';
 
-import paramGroups from './paramGroups';
 import Doc from './Doc';
 import DocBuilder from './DocBuilder';
+import paramGroups from './paramGroups';
 
 export class Doctopus {
-  private options;
   public Doc = Doc;
   public DocBuilder = DocBuilder;
   public get;
-  constructor(){
+  public options;
+
+  constructor() {
     this.options = {};
   }
 
-  set (key, value) {
+  public set(key: string, value) {
     if (arguments.length === 1) {
       return this.options[key];
     }
-  
+
     this.options[key] = value;
     return this;
   }
 
-  paramGroup (name, schema?) {
+  public paramGroup(name: string, schema?) {
     if (schema && typeof schema !== 'object') {
       throw new Error('The 2nd parameter to `doctopus.paramGroup()` should be a ' +
         'swagger schema');
@@ -46,5 +47,5 @@ export default new Doctopus();
 
 export {
   Doc,
-  DocBuilder
+  DocBuilder,
 };

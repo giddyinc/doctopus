@@ -3,49 +3,52 @@
 import _ from 'lodash';
 import autoBind from 'auto-bind';
 import paramGroups from './paramGroups';
-import { Schema, Operation, BaseSchema, BodyParameter, BaseParameter, PathParameter, Parameter, Path, Response } from 'swagger-schema-official';
+import {
+  Schema,
+  Operation, BaseSchema,
+  BodyParameter, BaseParameter, PathParameter,
+  Parameter,
+  Path,
+  Response,
+} from 'swagger-schema-official';
 
-let definitions: {[definitionsName: string]: Schema } = {};
+let definitions: { [definitionsName: string]: Schema } = {};
 
 /**
  * @class
  */
 class Doc {
-  private doc: Path;
-  private _params: { [key: string]: Parameter };
-  private modelName: string;
-
   /**
    * Store swagger definitions in the node module cache for Doc.js to reference in the Doc.extend() method.
    * @param {object} obj - Fully loaded set of stored swagger definitions.
    * @returns {void}
    */
-  static setDefinitions = function (obj): void {
+  public static setDefinitions = (obj): void => {
     definitions = obj;
-  };
+  }
 
   /**
- * @param {string} modelName - Name of the mongoose model.
- * @returns {object} - Reference to a swagger array object of the mongoose model schema.
- */
-  static arrayOfModel = function (modelName: string): Schema {
+   * @param {string} modelName - Name of the mongoose model.
+   * @returns {object} - Reference to a swagger array object of the mongoose model schema.
+   */
+  public static arrayOfModel = (modelName: string): Schema => {
     return {
-      type: 'array',
       items: {
-        $ref: `#/definitions/${modelName}`
-      }
+        $ref: `#/definitions/${modelName}`,
+      },
+      type: 'array',
     };
-  };
+  }
 
   /**
    * @param {string} modelName - Name of the mongoose model.
    * @returns {object} - Reference to a swagger definition object of the mongoose model schema.
    */
-  static model = function (modelName: string): Schema {
+  public static model = (modelName: string): Schema => {
     return {
-      $ref: `#/definitions/${modelName}`
+      $ref: `#/definitions/${modelName}`,
     };
-  };
+  }
 
   /**
    * Combines a parameter group with a swagger schema object to create a composite schema.
@@ -53,115 +56,115 @@ class Doc {
    * @param {object} arg? - Swagger schema object to merge.
    * @returns {object} - Reference to a swagger definition object schema.
    */
-  static withParamGroup = function (name: string, arg?) {
+  public static withParamGroup = (name: string, arg?) => {
     const group = paramGroups[name];
     if (!group) {
       return {};
     }
-    _.values(group).forEach(x => {
+    _.values(group).forEach((x) => {
       arg.properties[x.name] = {
-        type: x.type
+        type: x.type,
       };
     });
     return arg;
-  };
+  }
 
   /**
    * @param {object} schema - Schema to wrap in a swagger array.
    * @returns {object} - Reference to a swagger definition object of the schema array.
    */
-  static arrayOf = function (schema: Schema): Schema {
+  public static arrayOf = (schema: Schema): Schema => {
     return {
+      items: schema,
       type: 'array',
-      items: schema
     };
-  };
+  }
 
   /**
    * @param {object} props - Property hashmap to add to the swagger schema.
    * @returns {object} - Reference to a swagger definition object of the schema.
    * //{[propertyName: string]: Schema}
    */
-  static inlineObj = function (props): Schema {
+  public static inlineObj = (props): Schema => {
     return {
-      properties: props
+      properties: props,
     };
-  };
+  }
 
   /**
    * Helper to create a number typed swagger definition object.
    * @returns {object} - Reference to a swagger definition object for a number.
    */
-  static number = function () {
+  public static number = () => {
     return {
-      type: 'number'
+      type: 'number',
     };
-  };
+  }
 
   /**
    * Helper to create a file typed swagger definition object.
    * @returns {object} - Reference to a swagger definition object for a file.
    */
-  static file = function () {
+  public static file = () => {
     return {
-      type: 'file'
+      type: 'file',
     };
-  };
+  }
 
   /**
    * Helper to create a string typed swagger definition object.
    * @returns {object} - Reference to a swagger definition object for a string.
    */
-  static string = function () {
+  public static string = () => {
     return {
-      type: 'string'
+      type: 'string',
     };
-  };
+  }
 
   /**
    * Helper to create a object typed swagger definition object.
    * @returns {object} - Reference to a swagger definition object for an object.
    */
-  static object = function () {
+  public static object = () => {
     return {
-      type: 'object'
+      type: 'object',
     };
-  };
+  }
 
   /**
    * Helper to create a date typed swagger definition object.
    * @returns {object} - Reference to a swagger definition object for a date.
    */
-  static date = function () {
+  public static date = () => {
     return {
+      format: 'date',
       type: 'string',
-      format: 'date'
     };
-  };
+  }
 
   /**
    * Helper to create a bool typed swagger definition object.
    * @returns {object} - Reference to a swagger definition object for a bool.
    */
-  static bool = function () {
+  public static bool = () => {
     return {
-      type: 'boolean'
+      type: 'boolean',
     };
-  };
+  }
 
   /**
    * Helper to create a typed array swagger definition object.
    * @param {object} type - Type of primitive to create an array of.
    * @returns {object} - Reference to a swagger definition object for an array of a primitive type.
    */
-  static arrayOfType = function (type) {
+  public static arrayOfType = (type: string) => {
     return {
-      type: 'array',
       items: {
-        type
-      }
+        type,
+      },
+      type: 'array',
     };
-  };
+  }
 
   /**
    * Creates a copy of a registered swagger-mongoose definition object and allows you to override
@@ -170,18 +173,18 @@ class Doc {
    * @param {object} obj - Swagger schema object.
    * @returns {object} - Cloned/Modified Swagger Object
    */
-  static extend = function (modelName, obj) {
+  public static extend = (modelName: string, obj) => {
     if (!definitions[modelName]) {
       return {
         id: modelName,
-        properties: obj
+        properties: obj,
       };
     }
 
     return Object.assign({}, definitions[modelName], {
-      properties: Object.assign({}, definitions[modelName].properties, obj)
+      properties: Object.assign({}, definitions[modelName].properties, obj),
     });
-  };
+  }
 
   /**
    * Utility to create a named model property using a model reference, ex. { product: { gid: 1 } }
@@ -189,38 +192,38 @@ class Doc {
    * @param {string} modelName - definition reference
    * @returns {object} - swagger schema
    */
-  static namedModel = function (name: string, modelName: string): Schema {
+  public static namedModel = (name: string, modelName: string): Schema => {
     return Doc.inlineObj({
       [name]: {
-        schema: Doc.model(modelName)
-      }
+        schema: Doc.model(modelName),
+      },
     });
-  };
+  }
 
   /**
    * Generic function to wrap a schema in an envelope
    */
-  static wrap = function (name, schema) {
+  public static wrap = (name, schema) => {
     return Doc.inlineObj({
       [name]: {
-        schema
-      }
+        schema,
+      },
     });
-  };
+  }
 
   /**
-   * Utility to create a named model property using a model reference, for an array of a model ex. { products: [{ gid: 1 }] }
+   * Utility to create a named model property using a model reference, for an array of a model.
    * @param {string} name - label for the values
    * @param {string} modelName - definition reference
    * @returns {object} - swagger schema
    */
-  static namedModelArray = function (name: string, modelName: string) {
+  public static namedModelArray = (name: string, modelName: string): Schema => {
     return Doc.inlineObj({
       [name]: {
-        schema: Doc.arrayOfModel(modelName)
-      }
+        schema: Doc.arrayOfModel(modelName),
+      },
     });
-  };
+  }
 
   /**
    * Pull a nested property off of an existing mongoose schema.
@@ -228,10 +231,10 @@ class Doc {
    * @param {string} prop - Property to pick.
    * @returns {object} - Swagger Object containing id, and properties with the nested schema.
    */
-  static pick = function (modelName: string, prop?: string) {
+  public static pick = (modelName: string, prop?: string) => {
     const defaultResponse = {
       id: prop,
-      properties: {}
+      properties: {},
     };
     if (!definitions[modelName] || !definitions[modelName].properties || !prop) {
       return defaultResponse;
@@ -239,7 +242,7 @@ class Doc {
 
     const def = definitions[modelName].properties;
 
-    if(!def) {
+    if (!def) {
       return defaultResponse;
     }
 
@@ -258,17 +261,21 @@ class Doc {
 
     return {
       id: prop,
-      properties
+      properties,
     };
-  };
+  }
 
   /**
    * Retrieve swagger definitions from the node module cache in static js.
    * @returns {object} - Hashmap of swagger definitions
    */
-  static getDefinitions = function () {
+  public static getDefinitions = () => {
     return definitions;
-  };
+  }
+
+  private doc: Path;
+  private _params: { [key: string]: Parameter };
+  private modelName: string;
 
   constructor(doc = {}) {
     this.doc = doc;
@@ -276,7 +283,7 @@ class Doc {
 
     if (Object.keys(this.doc).length === 0) {
       this.doc.get = {
-        responses: {}
+        responses: {},
       };
     }
 
@@ -290,7 +297,7 @@ class Doc {
    * Set a common entity name to description presets.
    * @param {string} name - Name of the Model being returned.
    */
-  setModel(name: string) {
+  public setModel(name: string) {
     this.modelName = name;
     return this;
   }
@@ -299,15 +306,15 @@ class Doc {
    * Removes all registered parameters.
    * @returns {Doc} - Doc Instance
    */
-  clearParams() {
+  public clearParams() {
     this._params = {};
     return this;
   }
 
-  paramGroup(name: string) {
+  public paramGroup(name: string) {
     const schema = paramGroups[name];
     if (schema) {
-      _.values(schema).forEach(param => this.param(param));
+      _.values(schema).forEach((param) => this.param(param));
     }
     return this;
   }
@@ -317,7 +324,7 @@ class Doc {
    * @param {string} paramName - Renames the Id Parameter
    * @param {string} modelName - Adds an entity descriptor
    */
-  idParam(paramName: string, modelName?: string) {
+  public idParam(paramName?: string, modelName?: string) {
     const self = this;
     const name = paramName || 'id';
     const _modelName = modelName || self.modelName;
@@ -327,7 +334,7 @@ class Doc {
       description: `${_modelName} Id`,
       in: 'path',
       required: true,
-      type: 'string'
+      type: 'string',
     });
     return this;
   }
@@ -336,12 +343,12 @@ class Doc {
    * API returns with a body param containing an entity fitting the referenced schema.
    * @param {string} modelName - Shortcut for entity reference response
    */
-  modelBody(modelName: string) {
+  public modelBody(modelName: string) {
     return this.bodyParam({
       in: 'body',
       name: modelName,
       description: modelName,
-      schema: Doc.model(modelName)
+      schema: Doc.model(modelName),
     });
   }
 
@@ -349,7 +356,7 @@ class Doc {
    * Helper for JSON Payload response
    * @param {any} obj - Body sent in JSON Response
    */
-  bodyParam(obj: BodyParameter) {
+  public bodyParam(obj: BodyParameter) {
     if (typeof obj !== 'object') {
       throw new Error('Obj is required');
     }
@@ -371,7 +378,7 @@ class Doc {
     return this;
   }
 
-  param(obj: Parameter) {
+  public param(obj: Parameter) {
     if (typeof obj !== 'object') {
       throw new Error('Object is required');
     }
@@ -389,7 +396,7 @@ class Doc {
     return this;
   }
 
-  removeParam(name: string | { name: string }) {
+  public removeParam(name: string | { name: string }) {
     const { _params } = this;
     if (typeof name === 'object' && name.name) {
       name = name.name;
@@ -403,7 +410,7 @@ class Doc {
    * @param {any[]} arr - Param Array
    * @returns {Doc} - Doc Instance
    */
-  setParams(arr: Parameter[]) {
+  public setParams(arr: Parameter[]) {
     this.innerDoc().parameters = arr;
     return this;
   }
@@ -413,7 +420,7 @@ class Doc {
    * @param {string} txt - Text to set Group/Namespace to.
    * @returns {Doc} - Doc Instance.
    */
-  group(txt: string) {
+  public group(txt: string) {
     this.innerDoc().tags = [txt];
     return this;
   }
@@ -423,27 +430,29 @@ class Doc {
    * @param {string[]} arr - Tags/Groups/Namespaces to associate the route to.
    * @returns {Doc} - Doc Instance.
    */
-  tags(arr: string[]) {
+  public tags(arr: string[]) {
     this.innerDoc().tags = arr;
     return this;
   }
 
   /**
-   * Sets the Description for the document. Description is the long description that shows up on the expanded route view in swagger.
+   * Sets the Description for the document. Description is the long description
+   * that shows up on the expanded route view in swagger.
    * @param {string} txt - Text to set Description to.
    * @returns {Doc} - Doc Instance.
    */
-  description(txt) {
+  public description(txt: string) {
     this.innerDoc().description = txt || '';
     return this;
   }
 
   /**
-   * Sets the Summary for the document. Summary is the short description that shows up on the collapsed route view in swagger.
+   * Sets the Summary for the document.
+   * Summary is the short description that shows up on the collapsed route view in swagger.
    * @param {string} txt - Text to set summary to.
    * @returns {Doc} - Doc Instance.
    */
-  summary(txt) {
+  public summary(txt: string) {
     this.innerDoc().summary = txt || '';
     return this;
   }
@@ -453,7 +462,7 @@ class Doc {
    * @param {string} txt - Text to set operationId to
    * @returns {Doc} - Doc Instance
    */
-  operationId(txt) {
+  public operationId(txt) {
     this.innerDoc().operationId = txt || '';
     return this;
   }
@@ -462,7 +471,7 @@ class Doc {
    * Configures the documentation factory to produce a GET request.
    * @returns {Doc} - Doc Instance
    */
-  get() {
+  public get() {
     this.setMethod('get');
     return this;
   }
@@ -471,7 +480,7 @@ class Doc {
    * Configures the documentation factory to produce a POST request.
    * @returns {Doc} - Doc Instance
    */
-  post() {
+  public post() {
     this.setMethod('post');
     return this;
   }
@@ -480,7 +489,7 @@ class Doc {
    * Configures the documentation factory to produce a PUT request.
    * @returns {Doc} - Doc Instance
    */
-  put() {
+  public put() {
     this.setMethod('put');
     return this;
   }
@@ -489,7 +498,7 @@ class Doc {
    * Configures the documentation factory to produce a PATCH request.
    * @returns {Doc} - Doc Instance
    */
-  patch() {
+  public patch() {
     this.setMethod('patch');
     return this;
   }
@@ -498,7 +507,7 @@ class Doc {
    * Configures the documentation factory to produce a DELETE request.
    * @returns {Doc} - Doc Instance
    */
-  delete() {
+  public delete() {
     this.setMethod('delete');
     return this;
   }
@@ -508,7 +517,7 @@ class Doc {
    * @param {string} methodName - Method Name
    * @returns {Doc} - Doc Instance
    */
-  setMethod(methodName) {
+  public setMethod(methodName) {
     if (Object.keys(this.doc).length === 0) {
       this.doc[methodName] = {};
     } else {
@@ -522,7 +531,7 @@ class Doc {
     return this;
   }
 
-  add(key, val) {
+  public add(key, val) {
     const obj = this.innerDoc();
     obj[key] = val;
     return this;
@@ -532,10 +541,10 @@ class Doc {
    * Set response type to JSON
    * @returns {Doc} - Doc Instance
    */
-  json() {
+  public json() {
     const self = this;
     self.innerDoc().produces = [
-      'application/json'
+      'application/json',
     ];
     return this;
   }
@@ -544,10 +553,10 @@ class Doc {
    * Set response type to CSV
    * @returns {Doc} - Doc Instance
    */
-  csv() {
+  public csv() {
     const self = this;
     self.innerDoc().produces = [
-      'text/csv'
+      'text/csv',
     ];
     return this;
   }
@@ -556,36 +565,36 @@ class Doc {
    * Set response type to HTML
    * @returns {Doc} - Doc Instance
    */
-  html() {
+  public html() {
     const self = this;
     self.innerDoc().produces = [
-      'text/html'
+      'text/html',
     ];
     return this;
   }
 
-  innerDoc(): Operation {
+  public innerDoc(): Operation {
     const { doc } = this;
     const method = Object.keys(doc)[0];
     return doc[method];
   }
 
-  build() {
+  public build() {
     this.setParams(_.values(this._params));
     return _.cloneDeep(this.doc);
   }
 
-  onSuccessUseUtil(code, result) {
+  public onSuccessUseUtil(code, result) {
     return this.onSuccess(code, result, true);
   }
 
-  okAndBuild(schema, code: number) {
+  public okAndBuild(schema, code: number) {
     code = code || 200;
     const param = schema.schema ? schema : { schema };
     return this.onSuccess(code, param).build();
   }
 
-  wrapOkAndBuild(name: string, schema, code?: number) {
+  public wrapOkAndBuild(name: string, schema, code?: number) {
     code = code || 200;
     const massagedSchema = schema.schema ? schema : { schema };
     const param = Doc.wrap(name, massagedSchema);
@@ -593,7 +602,7 @@ class Doc {
   }
 
   // Response
-  onSuccess(code, result, useUtil?) {
+  public onSuccess(code, result, useUtil?) {
     // response code optional
     if (typeof code === 'object') {
       useUtil = result;
@@ -619,7 +628,7 @@ class Doc {
     if (useUtil) {
       const props: any = {
         title: 'data',
-        type: result.type
+        type: result.type,
       };
 
       const schema: Schema = {
@@ -629,15 +638,15 @@ class Doc {
             type: 'object',
             properties: {
               status: {
-                type: 'number'
+                type: 'number',
               },
               message: {
-                type: 'string'
-              }
-            }
+                type: 'string',
+              },
+            },
           },
-          data: props
-        }
+          data: props,
+        },
       };
 
       obj.responses[code].schema = schema;
