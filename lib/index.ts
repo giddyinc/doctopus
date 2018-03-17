@@ -43,3 +43,8 @@ export class Doctopus {
 Doctopus.prototype.get = Doctopus.prototype.set;
 
 export default new Doctopus();
+
+export {
+  Doc,
+  DocBuilder
+};

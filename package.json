@@ -55,7 +55,7 @@
   "repository": "giddyinc/doctopus",
   "scripts": {
     "prepublish": "gulp prepublish",
-    "test": "make test",
+    "test": "./node_modules/.bin/nyc --reporter=text --reporter=html --reporter=lcov ./node_modules/.bin/gulp",
     "test:watch": "gulp watch",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
