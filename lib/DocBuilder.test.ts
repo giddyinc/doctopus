@@ -1,10 +1,11 @@
 'use strict';
 
-const path = require('path');
-const expect = require('expect');
-const sinon = require('sinon');
-const Doc = require('./Doc');
-const DocBuilder = require('./DocBuilder');
+import path from 'path';
+import expect from 'expect';
+import sinon, { SinonSandbox } from 'sinon';
+
+import Doc from './Doc';
+import DocBuilder from './DocBuilder';
 
 /**
  * helper: lib/DocBuilder.test.js
@@ -13,7 +14,7 @@ const DocBuilder = require('./DocBuilder');
  */
 
 describe(path.basename(__filename).replace('.test.js', ''), () => {
-  let sandbox;
+  let sandbox: SinonSandbox;
   let docBuilder;
 
   beforeEach(() => {

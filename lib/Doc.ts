@@ -1,17 +1,272 @@
 'use strict';
 
-const autoBind = require('auto-bind');
-const _ = require('lodash');
-const paramGroups = require('./paramGroups');
+import _ from 'lodash';
+import autoBind from 'auto-bind';
+import paramGroups from './paramGroups';
+
 let definitions = {};
 
 /**
  * @class
  */
 class Doc {
-  constructor(doc) {
-    this.doc = doc || {};
+  private doc: any;
+  private _params: any;
+  private modelName: string;
 
+  /**
+   * Store swagger definitions in the node module cache for Doc.js to reference in the Doc.extend() method.
+   * @param {object} obj - Fully loaded set of stored swagger definitions.
+   * @returns {void}
+   */
+  static setDefinitions = function (obj) {
+    definitions = obj;
+  };
+
+  /**
+ * @param {string} modelName - Name of the mongoose model.
+ * @returns {object} - Reference to a swagger array object of the mongoose model schema.
+ */
+static arrayOfModel = function (modelName) {
+  return {
+    type: 'array',
+    items: {
+      $ref: `#/definitions/${modelName}`
+    }
+  };
+};
+
+/**
+ * @param {string} modelName - Name of the mongoose model.
+ * @returns {object} - Reference to a swagger definition object of the mongoose model schema.
+ */
+static model = function (modelName) {
+  return {
+    $ref: `#/definitions/${modelName}`
+  };
+};
+
+/**
+ * Combines a parameter group with a swagger schema object to create a composite schema.
+ * @param {string} name - Parameter group name (see Documentation/paramgroups).
+ * @param {object} arg? - Swagger schema object to merge.
+ * @returns {object} - Reference to a swagger definition object schema.
+ */
+static withParamGroup = function (name: string, arg?) {
+  const group = paramGroups[name];
+  if (!group) {
+    return {};
+  }
+  _.values(group).forEach(x => {
+    arg.properties[x.name] = {
+      type: x.type
+    };
+  });
+  return arg;
+};
+
+/**
+ * @param {object} schema - Schema to wrap in a swagger array.
+ * @returns {object} - Reference to a swagger definition object of the schema array.
+ */
+static arrayOf = function (schema) {
+  return {
+    type: 'array',
+    items: {
+      schema
+    }
+  };
+};
+
+/**
+ * @param {object} props - Property hashmap to add to the swagger schema.
+ * @returns {object} - Reference to a swagger definition object of the schema.
+ */
+static inlineObj = function (props) {
+  return {
+    properties: props
+  };
+};
+
+/**
+ * Helper to create a number typed swagger definition object.
+ * @returns {object} - Reference to a swagger definition object for a number.
+ */
+static number = function () {
+  return {
+    type: 'number'
+  };
+};
+
+/**
+ * Helper to create a file typed swagger definition object.
+ * @returns {object} - Reference to a swagger definition object for a file.
+ */
+static file = function () {
+  return {
+    type: 'file'
+  };
+};
+
+/**
+ * Helper to create a string typed swagger definition object.
+ * @returns {object} - Reference to a swagger definition object for a string.
+ */
+static string = function () {
+  return {
+    type: 'string'
+  };
+};
+
+/**
+ * Helper to create a object typed swagger definition object.
+ * @returns {object} - Reference to a swagger definition object for an object.
+ */
+static object = function () {
+  return {
+    type: 'object'
+  };
+};
+
+/**
+ * Helper to create a date typed swagger definition object.
+ * @returns {object} - Reference to a swagger definition object for a date.
+ */
+static date = function () {
+  return {
+    type: 'string',
+    format: 'date'
+  };
+};
+
+/**
+ * Helper to create a bool typed swagger definition object.
+ * @returns {object} - Reference to a swagger definition object for a bool.
+ */
+static bool = function () {
+  return {
+    type: 'boolean'
+  };
+};
+
+/**
+ * Helper to create a typed array swagger definition object.
+ * @param {object} type - Type of primitive to create an array of.
+ * @returns {object} - Reference to a swagger definition object for an array of a primitive type.
+ */
+static arrayOfType = function (type) {
+  return {
+    type: 'array',
+    items: {
+      type
+    }
+  };
+};
+
+/**
+ * Creates a copy of a registered swagger-mongoose definition object and allows you to override
+ * properties (delete, replace) to speed up DTO documentation
+ * @param {string} modelName - Mongoose model name or pre-registered definition name.
+ * @param {object} obj - Swagger schema object.
+ * @returns {object} - Cloned/Modified Swagger Object
+ */
+static extend = function (modelName, obj) {
+  if (!definitions[modelName]) {
+    return {
+      id: modelName,
+      properties: obj
+    };
+  }
+
+  return Object.assign({}, definitions[modelName], {
+    properties: Object.assign({}, definitions[modelName].properties, obj)
+  });
+};
+
+/**
+ * Utility to create a named model property using a model reference, ex. { product: { gid: 1 } }
+ * @param {string} name - label for the values
+ * @param {string} modelName - definition reference
+ * @returns {object} - swagger schema
+ */
+static namedModel = function (name, modelName) {
+  return Doc.inlineObj({
+    [name]: {
+      schema: Doc.model(modelName)
+    }
+  });
+};
+
+/**
+ * Generic function to wrap a schema in an envelope
+ */
+static wrap = function (name, schema) {
+  return Doc.inlineObj({
+    [name]: {
+      schema
+    }
+  });
+};
+
+/**
+ * Utility to create a named model property using a model reference, for an array of a model ex. { products: [{ gid: 1 }] }
+ * @param {string} name - label for the values
+ * @param {string} modelName - definition reference
+ * @returns {object} - swagger schema
+ */
+static namedModelArray = function (name, modelName) {
+  return Doc.inlineObj({
+    [name]: {
+      schema: Doc.arrayOfModel(modelName)
+    }
+  });
+};
+
+/**
+ * Pull a nested property off of an existing mongoose schema.
+ * @param {string} modelName - Source mongoose model to pick a property from.
+ * @param {string} prop - Property to pick.
+ * @returns {object} - Swagger Object containing id, and properties with the nested schema.
+ */
+static pick = function (modelName, prop) {
+  if (!definitions[modelName] || !definitions[modelName].properties) {
+    return {
+      id: prop,
+      properties: {}
+    };
+  }
+
+  const def = definitions[modelName].properties;
+
+  if (def[prop]) {
+    return def[prop];
+  }
+
+  const properties = {};
+
+  for (const i in def) {
+    if (i.includes(prop)) {
+      const trunc = i.replace(`${prop}.`, '');
+      properties[trunc] = def[i];
+    }
+  }
+
+  return {
+    id: prop,
+    properties
+  };
+};
+
+  /**
+   * Retrieve swagger definitions from the node module cache in static js.
+   * @returns {object} - Hashmap of swagger definitions
+   */
+  static getDefinitions = function () {
+    return definitions;
+  };
+
+  constructor(doc = {}) {
+    this.doc= doc;
     this._params = {};
 
     if (Object.keys(this.doc).length === 0) {
@@ -315,18 +570,18 @@ class Doc {
 
   okAndBuild(schema, code) {
     code = code || 200;
-    const param = schema.schema ? schema : {schema};
+    const param = schema.schema ? schema : { schema };
     return this.onSuccess(code, param).build();
   }
 
   wrapOkAndBuild(name, schema, code) {
     code = code || 200;
-    const massagedSchema = schema.schema ? schema : {schema};
+    const massagedSchema = schema.schema ? schema : { schema };
     const param = Doc.wrap(name, massagedSchema);
     return this.onSuccess(code, param).build();
   }
 
-  onSuccess(code, result, useUtil) {
+  onSuccess(code, result, useUtil?) {
     // response code optional
     if (typeof code === 'object') {
       useUtil = result;
@@ -337,8 +592,9 @@ class Doc {
     const obj = this.innerDoc();
 
     if (obj.responses) {
-      Object.keys(obj.responses).forEach(k => {
-        if (k >= 200 && k < 300) {
+      Object.keys(obj.responses).forEach((k: string) => {
+        const num = parseInt(k);
+        if (num >= 200 && num < 300) {
           delete obj.responses[k];
         }
       });
@@ -383,255 +639,4 @@ class Doc {
   }
 }
 
-/**
- * @param {string} modelName - Name of the mongoose model.
- * @returns {object} - Reference to a swagger array object of the mongoose model schema.
- */
-Doc.arrayOfModel = function (modelName) {
-  return {
-    type: 'array',
-    items: {
-      $ref: `#/definitions/${modelName}`
-    }
-  };
-};
-
-/**
- * @param {string} modelName - Name of the mongoose model.
- * @returns {object} - Reference to a swagger definition object of the mongoose model schema.
- */
-Doc.model = function (modelName) {
-  return {
-    $ref: `#/definitions/${modelName}`
-  };
-};
-
-/**
- * Combines a parameter group with a swagger schema object to create a composite schema.
- * @param {string} name - Parameter group name (see Documentation/paramgroups).
- * @param {object} arg - Swagger schema object to merge.
- * @returns {object} - Reference to a swagger definition object schema.
- */
-Doc.withParamGroup = function (name, arg) {
-  const group = paramGroups[name];
-  if (!group) {
-    return {};
-  }
-  _.values(group).forEach(x => {
-    arg.properties[x.name] = {
-      type: x.type
-    };
-  });
-  return arg;
-};
-
-/**
- * @param {object} schema - Schema to wrap in a swagger array.
- * @returns {object} - Reference to a swagger definition object of the schema array.
- */
-Doc.arrayOf = function (schema) {
-  return {
-    type: 'array',
-    items: {
-      schema
-    }
-  };
-};
-
-/**
- * @param {object} props - Property hashmap to add to the swagger schema.
- * @returns {object} - Reference to a swagger definition object of the schema.
- */
-Doc.inlineObj = function (props) {
-  return {
-    properties: props
-  };
-};
-
-/**
- * Helper to create a number typed swagger definition object.
- * @returns {object} - Reference to a swagger definition object for a number.
- */
-Doc.number = function () {
-  return {
-    type: 'number'
-  };
-};
-
-/**
- * Helper to create a file typed swagger definition object.
- * @returns {object} - Reference to a swagger definition object for a file.
- */
-Doc.file = function () {
-  return {
-    type: 'file'
-  };
-};
-
-/**
- * Helper to create a string typed swagger definition object.
- * @returns {object} - Reference to a swagger definition object for a string.
- */
-Doc.string = function () {
-  return {
-    type: 'string'
-  };
-};
-
-/**
- * Helper to create a object typed swagger definition object.
- * @returns {object} - Reference to a swagger definition object for an object.
- */
-Doc.object = function () {
-  return {
-    type: 'object'
-  };
-};
-
-/**
- * Helper to create a date typed swagger definition object.
- * @returns {object} - Reference to a swagger definition object for a date.
- */
-Doc.date = function () {
-  return {
-    type: 'string',
-    format: 'date'
-  };
-};
-
-/**
- * Helper to create a bool typed swagger definition object.
- * @returns {object} - Reference to a swagger definition object for a bool.
- */
-Doc.bool = function () {
-  return {
-    type: 'boolean'
-  };
-};
-
-/**
- * Helper to create a typed array swagger definition object.
- * @param {object} type - Type of primitive to create an array of.
- * @returns {object} - Reference to a swagger definition object for an array of a primitive type.
- */
-Doc.arrayOfType = function (type) {
-  return {
-    type: 'array',
-    items: {
-      type
-    }
-  };
-};
-
-/**
- * Creates a copy of a registered swagger-mongoose definition object and allows you to override
- * properties (delete, replace) to speed up DTO documentation
- * @param {string} modelName - Mongoose model name or pre-registered definition name.
- * @param {object} obj - Swagger schema object.
- * @returns {object} - Cloned/Modified Swagger Object
- */
-Doc.extend = function (modelName, obj) {
-  if (!definitions[modelName]) {
-    return {
-      id: modelName,
-      properties: obj
-    };
-  }
-
-  return Object.assign({}, definitions[modelName], {
-    properties: Object.assign({}, definitions[modelName].properties, obj)
-  });
-};
-
-/**
- * Utility to create a named model property using a model reference, ex. { product: { gid: 1 } }
- * @param {string} name - label for the values
- * @param {string} modelName - definition reference
- * @returns {object} - swagger schema
- */
-Doc.namedModel = function (name, modelName) {
-  return Doc.inlineObj({
-    [name]: {
-      schema: Doc.model(modelName)
-    }
-  });
-};
-
-/**
- * Generic function to wrap a schema in an envelope
- */
-Doc.wrap = function (name, schema) {
-  return Doc.inlineObj({
-    [name]: {
-      schema
-    }
-  });
-};
-
-/**
- * Utility to create a named model property using a model reference, for an array of a model ex. { products: [{ gid: 1 }] }
- * @param {string} name - label for the values
- * @param {string} modelName - definition reference
- * @returns {object} - swagger schema
- */
-Doc.namedModelArray = function (name, modelName) {
-  return Doc.inlineObj({
-    [name]: {
-      schema: Doc.arrayOfModel(modelName)
-    }
-  });
-};
-
-/**
- * Pull a nested property off of an existing mongoose schema.
- * @param {string} modelName - Source mongoose model to pick a property from.
- * @param {string} prop - Property to pick.
- * @returns {object} - Swagger Object containing id, and properties with the nested schema.
- */
-Doc.pick = function (modelName, prop) {
-  if (!definitions[modelName] || !definitions[modelName].properties) {
-    return {
-      id: prop,
-      properties: {}
-    };
-  }
-
-  const def = definitions[modelName].properties;
-
-  if (def[prop]) {
-    return def[prop];
-  }
-
-  const properties = {};
-
-  for (const i in def) {
-    if (i.includes(prop)) {
-      const trunc = i.replace(`${prop}.`, '');
-      properties[trunc] = def[i];
-    }
-  }
-
-  return {
-    id: prop,
-    properties
-  };
-};
-
-/**
- * Store swagger definitions in the node module cache for Doc.js to reference in the Doc.extend() method.
- * @param {object} obj - Fully loaded set of stored swagger definitions.
- * @returns {void}
- */
-Doc.setDefinitions = function (obj) {
-  definitions = obj;
-};
-
-/**
- * Retrieve swagger definitions from the node module cache in Doc.js.
- * @returns {object} - Hashmap of swagger definitions
- */
-Doc.getDefinitions = function () {
-  return definitions;
-};
-
-module.exports = Doc;
+export default Doc;

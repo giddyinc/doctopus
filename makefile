@@ -2,7 +2,7 @@
 .PHONY: test docs
 
 clean:
-	rm -rf .nyc_output coverage dist
+	rm -rf .nyc_output coverage dist docs
 
 lint:
 	./node_modules/.bin/eslint ./lib

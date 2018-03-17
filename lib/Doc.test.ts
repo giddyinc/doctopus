@@ -1,11 +1,11 @@
 'use strict';
 
-const path = require('path');
-const expect = require('expect');
-const sinon = require('sinon');
+import path from 'path';
+import expect from 'expect';
+import sinon from 'sinon';
 
-const doctopus = require('.');
-const Doc = require('./Doc');
+import doctopus from '.';
+import Doc from './Doc';
 
 /**
  * mocha --require clarify lib/Doc.test.js --watch -R nyan

@@ -1,18 +1,15 @@
 
 'use strict';
 
-const _ = require('lodash');
-const expect = require('expect');
-const sinon = require('sinon');
-const path = require('path');
-const doctopus = require('.');
-const paramGroups = require('./paramGroups');
+import  _ from 'lodash';
+import path from 'path';
+import expect from 'expect';
+import sinon from 'sinon';
+import doctopus from '.';
+import paramGroups from './paramGroups';
 
 /**
-* helper: ./lib/indext.test.js
-* mocha --require clarify ./lib/indext.test.js --watch
-* istanbul cover --print both node_modules/.bin/_mocha -- ./path/to/file.test.js
-* eslint ./path/to/file.test.js --watch
+* mocha ./lib/indext.test.ts --opts .mocharc --watch
 */
 
 describe(path.basename(__filename).replace('.test.js', ''), () => {

@@ -3,7 +3,7 @@
 
 const path = require('path');
 const gulp = require('gulp');
-const eslint = require('gulp-eslint');
+// const eslint = require('gulp-eslint');
 const excludeGitignore = require('gulp-exclude-gitignore');
 const mocha = require('gulp-mocha');
 const istanbul = require('gulp-istanbul');
@@ -12,18 +12,23 @@ const plumber = require('gulp-plumber');
 const coveralls = require('gulp-coveralls');
 const del = require('del');
 const isparta = require('isparta');
+const ts = require('gulp-typescript');
+const tsProject = ts.createProject('tsconfig.json');
 
-gulp.task('static', () => gulp.src(['**/*.js'])
+gulp.task('static', () => gulp.src(['**/*.{js,ts}'])
     .pipe(excludeGitignore())
-    .pipe(eslint())
-    .pipe(eslint.format())
-    .pipe(eslint.failAfterError()));
+    .pipe(tsProject())
+    // .pipe(eslint())
+    // .pipe(eslint.format())
+    // .pipe(eslint.failAfterError())
+  )
+    ;
 
 gulp.task('nsp', cb => {
   nsp({package: path.resolve('package.json')}, cb);
 });
 
-gulp.task('pre-test', () => gulp.src(['lib/**/*.js', '!lib/**/*.test.js'])
+gulp.task('pre-test', () => gulp.src(['lib/**/*.{js,ts}', '!lib/**/*.test.{js,ts}'])
     .pipe(excludeGitignore())
     .pipe(istanbul({
       includeUntested: true,
@@ -31,15 +36,19 @@ gulp.task('pre-test', () => gulp.src(['lib/**/*.js', '!lib/**/*.test.js'])
     }))
     .pipe(istanbul.hookRequire()));
 
-gulp.task('test', ['pre-test'], cb => {
+gulp.task('test', [], cb => {
   let mochaErr;
   gulp.src([
-    'lib/**/*.test.js',
-    'test/**/*.js'
+    'lib/**/*.test.{js,ts}',
+    'test/**/*.{js,ts}'
   ])
+    // .pipe(tsProject())
     .pipe(plumber())
     .pipe(mocha({
-      reporter: 'dot'
+      reporter: 'dot',
+      require: [
+        'ts-node/register'
+      ]
     }))
     .on('error', err => {
       mochaErr = err;

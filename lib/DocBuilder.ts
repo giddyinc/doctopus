@@ -1,14 +1,18 @@
 'use strict';
 
-const _ = require('lodash');
-const Doc = require('./Doc');
-const autoBind = require('auto-bind');
+import _ from 'lodash';
+import Doc from './Doc';
+import autoBind from 'auto-bind';
 
 /**
  * @class
  */
 class DocBuilder {
-  constructor(docs) {
+  private docs: any;
+  private definitions: any;
+  private options: any;
+
+  constructor(docs?) {
     this.docs = docs || {};
     autoBind(this);
     this.definitions = {};
@@ -61,7 +65,8 @@ class DocBuilder {
       swagger: '2.0',
       securityDefitions: {},
       paths: this.docs,
-      definitions: this.definitions
+      definitions: this.definitions,
+      host: ''
     };
 
     if (this.options.host) {
@@ -85,7 +90,7 @@ class DocBuilder {
    * @param {string} modelName - Mongoose Model Name
    * @returns {Doc} - Doc Factory Instance
    */
-  getFactory(namespace, modelName) {
+  getFactory(namespace, modelName: string) {
     const factory = new Doc();
     factory.group(namespace);
     if (modelName) {
@@ -95,4 +100,4 @@ class DocBuilder {
   }
 }
 
-module.exports = DocBuilder;
+export default DocBuilder;
