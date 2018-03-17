@@ -3,6 +3,7 @@
 import _ from 'lodash';
 import Doc from './Doc';
 import autoBind from 'auto-bind';
+import { Spec } from 'swagger-schema-official';
 
 /**
  * @class
@@ -55,22 +56,23 @@ class DocBuilder {
     Object.assign(self.docs[path], doc);
   }
 
-  build() {
-    const spec = {
+  build(): Spec {
+    const { definitions, docs, options } = this;
+    const spec: Spec = {
       info: {
-        title: this.options.title || 'Title', // Title (required)
-        version: this.options.version || '1.0.0' // Version (required)
+        title: options.title || 'Title', // Title (required)
+        version: options.version || '1.0.0' // Version (required)
       },
       tags: [],
       swagger: '2.0',
-      securityDefitions: {},
-      paths: this.docs,
-      definitions: this.definitions,
+      securityDefinitions: {},
+      paths: docs,
+      definitions: definitions,
       host: ''
     };
 
-    if (this.options.host) {
-      spec.host = this.options.host;
+    if (options.host) {
+      spec.host = options.host;
     }
 
     return _.cloneDeep(spec);

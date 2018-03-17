@@ -7,14 +7,14 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "lib": [
-      "esnext"
+      "es2017"
     ],
     "target": "es5",
     "strict": true,
     "outDir": "./dist",
     "preserveConstEnums": true,
     "removeComments": true,
-    "inlineSourceMap": true,
+    "inlineSourceMap": false,
     "noImplicitAny": false,
     "typeRoots": [
       "./node_modules/@types"

@@ -5,7 +5,7 @@ import paramGroups from './paramGroups';
 import Doc from './Doc';
 import DocBuilder from './DocBuilder';
 
-class Doctopus {
+export class Doctopus {
   private options;
   public Doc = Doc;
   public DocBuilder = DocBuilder;

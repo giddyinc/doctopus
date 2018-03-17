@@ -112,6 +112,12 @@
       "integrity": "sha512-rvgY5bK5ZBRJPuJF0vJI+NC2gt+lakobTa8pnDS/oRH2gk/tooeDEel8piZA8Ng6pxq0A5QGzilIFSyashP6jw==",
       "dev": true
     },
+    "@types/swagger-schema-official": {
+      "version": "2.0.9",
+      "resolved": "https://registry.npmjs.org/@types/swagger-schema-official/-/swagger-schema-official-2.0.9.tgz",
+      "integrity": "sha512-VfJqsiGMitrKpMJmcyl15Z69xrscqnWGTnGaCwid3KRpAlXYlL76TNM3qQtNaBCP0Cg/9Hh3FhmpWa/qZ9NENw==",
+      "dev": true
+    },
     "@types/undertaker": {
       "version": "1.2.0",
       "resolved": "https://registry.npmjs.org/@types/undertaker/-/undertaker-1.2.0.tgz",
