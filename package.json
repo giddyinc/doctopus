@@ -31,6 +31,7 @@
     "@types/node": "^8.0.34",
     "@types/sinon": "4.3.0",
     "clarify": "^2.0.0",
+    "coveralls": "3.0.0",
     "del": "^2.0.2",
     "eslint": "^3.1.1",
     "eslint-config-xo-space": "^0.15.0",
@@ -39,14 +40,14 @@
     "gulp-coveralls": "^0.1.0",
     "gulp-eslint": "^3.0.1",
     "gulp-exclude-gitignore": "^1.0.0",
-    "gulp-istanbul": "^1.0.0",
     "gulp-line-ending-corrector": "^1.0.1",
     "gulp-mocha": "^3.0.1",
     "gulp-nsp": "^2.1.0",
     "gulp-plumber": "^1.0.0",
     "gulp-typescript": "4.0.1",
-    "isparta": "^4.0.0",
+    "nyc": "11.6.0",
     "sinon": "^1.17.6",
+    "source-map-support": "0.5.4",
     "ts-node": "5.0.1",
     "typescript": "2.7.2"
   },
@@ -54,7 +55,8 @@
   "scripts": {
     "prepublish": "gulp prepublish",
     "test": "make test",
-    "test:watch": "gulp watch"
+    "test:watch": "gulp watch",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "dependencies": {
     "auto-bind": "^1.1.0",

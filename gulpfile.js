@@ -1,40 +1,26 @@
-
 'use strict';
 
 const path = require('path');
 const gulp = require('gulp');
-// const eslint = require('gulp-eslint');
 const excludeGitignore = require('gulp-exclude-gitignore');
 const mocha = require('gulp-mocha');
-const istanbul = require('gulp-istanbul');
 const nsp = require('gulp-nsp');
 const plumber = require('gulp-plumber');
 const coveralls = require('gulp-coveralls');
 const del = require('del');
-const isparta = require('isparta');
 const ts = require('gulp-typescript');
 const tsProject = ts.createProject('tsconfig.json');
 
-gulp.task('static', () => gulp.src(['**/*.{js,ts}'])
-    .pipe(excludeGitignore())
-    .pipe(tsProject())
-    // .pipe(eslint())
-    // .pipe(eslint.format())
-    // .pipe(eslint.failAfterError())
-  )
-    ;
+gulp.task('static', () => gulp.src(['src/**/*.{js,ts}'])
+  .pipe(excludeGitignore())
+  .pipe(tsProject())
+);
 
 gulp.task('nsp', cb => {
-  nsp({package: path.resolve('package.json')}, cb);
+  nsp({
+    package: path.resolve('package.json')
+  }, cb);
 });
-
-gulp.task('pre-test', () => gulp.src(['lib/**/*.{js,ts}', '!lib/**/*.test.{js,ts}'])
-    .pipe(excludeGitignore())
-    .pipe(istanbul({
-      includeUntested: true,
-      instrumenter: isparta.Instrumenter
-    }))
-    .pipe(istanbul.hookRequire()));
 
 gulp.task('test', [], cb => {
   let mochaErr;
@@ -42,7 +28,6 @@ gulp.task('test', [], cb => {
     'lib/**/*.test.{js,ts}',
     'test/**/*.{js,ts}'
   ])
-    // .pipe(tsProject())
     .pipe(plumber())
     .pipe(mocha({
       reporter: 'dot',
@@ -53,7 +38,7 @@ gulp.task('test', [], cb => {
     .on('error', err => {
       mochaErr = err;
     })
-    .pipe(istanbul.writeReports())
+    // .pipe(istanbul.writeReports())
     .on('end', () => {
       cb(mochaErr);
     });
@@ -73,10 +58,11 @@ gulp.task('coveralls', ['test'], () => {
 });
 
 gulp.task('babel', ['clean'], () => gulp.src([
-  'lib/**/*.js',
-  '!lib/**/*.test.js'
+  'lib/**/*.{js,ts}',
+  '!lib/**/*.test.{js,ts}'
 ])
-    .pipe(gulp.dest('dist')));
+  .pipe(tsProject())
+  .pipe(gulp.dest('dist')));
 
 gulp.task('clean', () => del('dist'));
 

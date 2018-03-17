@@ -1,0 +1,12 @@
+{
+  "report-dir": "./coverage",
+  "require": [
+    "ts-node/register"
+  ],
+  "extension": [
+    ".ts"
+  ],
+  "exclude": [
+    "gulpfile.js"
+  ]
+}
