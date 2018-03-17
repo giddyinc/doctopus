@@ -27,7 +27,7 @@ class Doc {
  * @param {string} modelName - Name of the mongoose model.
  * @returns {object} - Reference to a swagger array object of the mongoose model schema.
  */
-static arrayOfModel = function (modelName) {
+static arrayOfModel = function (modelName: string) {
   return {
     type: 'array',
     items: {
@@ -40,7 +40,7 @@ static arrayOfModel = function (modelName) {
  * @param {string} modelName - Name of the mongoose model.
  * @returns {object} - Reference to a swagger definition object of the mongoose model schema.
  */
-static model = function (modelName) {
+static model = function (modelName: string) {
   return {
     $ref: `#/definitions/${modelName}`
   };
@@ -228,8 +228,8 @@ static namedModelArray = function (name, modelName) {
  * @param {string} prop - Property to pick.
  * @returns {object} - Swagger Object containing id, and properties with the nested schema.
  */
-static pick = function (modelName, prop) {
-  if (!definitions[modelName] || !definitions[modelName].properties) {
+static pick = function (modelName: string, prop?: string) {
+  if (!definitions[modelName] || !definitions[modelName].properties || !prop) {
     return {
       id: prop,
       properties: {}
@@ -283,7 +283,7 @@ static pick = function (modelName, prop) {
    * Set a common entity name to description presets.
    * @param {string} name - Name of the Model being returned.
    */
-  setModel(name) {
+  setModel(name: string) {
     this.modelName = name;
     return this;
   }
@@ -297,7 +297,7 @@ static pick = function (modelName, prop) {
     return this;
   }
 
-  paramGroup(name) {
+  paramGroup(name: string) {
     const schema = paramGroups[name];
     if (schema) {
       _.values(schema).forEach(param => this.param(param));
@@ -310,7 +310,7 @@ static pick = function (modelName, prop) {
    * @param {string} paramName - Renames the Id Parameter
    * @param {string} modelName - Adds an entity descriptor
    */
-  idParam(paramName, modelName) {
+  idParam(paramName: string, modelName?: string) {
     const self = this;
     const name = paramName || 'id';
     const _modelName = modelName || self.modelName;
@@ -329,8 +329,9 @@ static pick = function (modelName, prop) {
    * API returns with a body param containing an entity fitting the referenced schema.
    * @param {string} modelName - Shortcut for entity reference response
    */
-  modelBody(modelName) {
+  modelBody(modelName: string) {
     return this.bodyParam({
+      name: modelName,
       description: modelName,
       schema: Doc.model(modelName)
     });
@@ -340,7 +341,13 @@ static pick = function (modelName, prop) {
    * Helper for JSON Payload response
    * @param {any} obj - Body sent in JSON Response
    */
-  bodyParam(obj) {
+  bodyParam(obj: {
+    required?: boolean;
+    in?: string;
+    description?: string;
+    name: string;
+    schema?: any;
+  }) {
     if (typeof obj !== 'object') {
       throw new Error('Obj is required');
     }
@@ -380,11 +387,12 @@ static pick = function (modelName, prop) {
     return this;
   }
 
-  removeParam(name) {
+  removeParam(name: string | { name: string }) {
+    const { _params } = this;
     if (typeof name === 'object' && name.name) {
       name = name.name;
     }
-    delete this._params[name];
+    delete _params[name as string];
     return this;
   }
 
@@ -393,7 +401,7 @@ static pick = function (modelName, prop) {
    * @param {any[]} arr - Param Array
    * @returns {Doc} - Doc Instance
    */
-  setParams(arr) {
+  setParams(arr: any[]) {
     this.innerDoc().parameters = arr;
     return this;
   }
@@ -403,7 +411,7 @@ static pick = function (modelName, prop) {
    * @param {string} txt - Text to set Group/Namespace to.
    * @returns {Doc} - Doc Instance.
    */
-  group(txt) {
+  group(txt: string) {
     this.innerDoc().tags = [txt];
     return this;
   }
@@ -413,7 +421,7 @@ static pick = function (modelName, prop) {
    * @param {string[]} arr - Tags/Groups/Namespaces to associate the route to.
    * @returns {Doc} - Doc Instance.
    */
-  tags(arr) {
+  tags(arr: string[]) {
     this.innerDoc().tags = arr;
     return this;
   }
@@ -568,13 +576,13 @@ static pick = function (modelName, prop) {
     return this.onSuccess(code, result, true);
   }
 
-  okAndBuild(schema, code) {
+  okAndBuild(schema, code: number) {
     code = code || 200;
     const param = schema.schema ? schema : { schema };
     return this.onSuccess(code, param).build();
   }
 
-  wrapOkAndBuild(name, schema, code) {
+  wrapOkAndBuild(name: string, schema, code?: number) {
     code = code || 200;
     const massagedSchema = schema.schema ? schema : { schema };
     const param = Doc.wrap(name, massagedSchema);

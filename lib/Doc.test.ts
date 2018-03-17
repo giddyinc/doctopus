@@ -8,9 +8,7 @@ import doctopus from '.';
 import Doc from './Doc';
 
 /**
- * mocha --require clarify lib/Doc.test.js --watch -R nyan
- * istanbul cover --print both node_modules/.bin/_mocha -- lib/Doc.test.js
- * eslint ./path/to/file.test.js --watch
+ * mocha lib/Doc.test.ts --opts .mocharc --watch
  */
 
 describe(path.basename(__filename).replace('.test.js', ''), () => {
@@ -295,7 +293,7 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
     it('arrayOf', () => {
       const result = Doc.arrayOf(Doc.string());
       expect(result.type === 'array');
-      expect(result.items.type === 'string');
+      expect((result.items as any).type === 'string');
     });
 
     it('namedModel', () => {
@@ -380,12 +378,19 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
       }
     };
     beforeEach(() => Doc.setDefinitions(defs));
-    it('should return a default', () => expect(Doc.pick('baz')).toExist());
+
+    it('should return a default', () => {
+      const result = Doc.pick('baz');
+      expect(result).toExist()
+      console.log(result);
+    });
+
     it('should return some clawz', () => {
       const result = Doc.pick('Cat', 'claws');
       expect(result).toExist();
       expect(result.properties.sharpness).toExist();
     });
+
     it('should return some nested props', () => {
       const result = Doc.pick('Cat', 'color');
       expect(result).toExist();
