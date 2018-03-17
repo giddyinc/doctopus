@@ -3,16 +3,16 @@
 import _ from 'lodash';
 import autoBind from 'auto-bind';
 import paramGroups from './paramGroups';
-import { Schema, Operation, BaseSchema } from 'swagger-schema-official';
+import { Schema, Operation, BaseSchema, BodyParameter, BaseParameter, PathParameter, Parameter, Path, Response } from 'swagger-schema-official';
 
-let definitions = {};
+let definitions: {[definitionsName: string]: Schema } = {};
 
 /**
  * @class
  */
 class Doc {
-  private doc: any;
-  private _params: any;
+  private doc: Path;
+  private _params: { [key: string]: Parameter };
   private modelName: string;
 
   /**
@@ -20,7 +20,7 @@ class Doc {
    * @param {object} obj - Fully loaded set of stored swagger definitions.
    * @returns {void}
    */
-  static setDefinitions = function (obj) {
+  static setDefinitions = function (obj): void {
     definitions = obj;
   };
 
@@ -28,7 +28,7 @@ class Doc {
  * @param {string} modelName - Name of the mongoose model.
  * @returns {object} - Reference to a swagger array object of the mongoose model schema.
  */
-  static arrayOfModel = function (modelName: string) {
+  static arrayOfModel = function (modelName: string): Schema {
     return {
       type: 'array',
       items: {
@@ -41,7 +41,7 @@ class Doc {
    * @param {string} modelName - Name of the mongoose model.
    * @returns {object} - Reference to a swagger definition object of the mongoose model schema.
    */
-  static model = function (modelName: string) {
+  static model = function (modelName: string): Schema {
     return {
       $ref: `#/definitions/${modelName}`
     };
@@ -70,20 +70,19 @@ class Doc {
    * @param {object} schema - Schema to wrap in a swagger array.
    * @returns {object} - Reference to a swagger definition object of the schema array.
    */
-  static arrayOf = function (schema) {
+  static arrayOf = function (schema: Schema): Schema {
     return {
       type: 'array',
-      items: {
-        schema
-      }
+      items: schema
     };
   };
 
   /**
    * @param {object} props - Property hashmap to add to the swagger schema.
    * @returns {object} - Reference to a swagger definition object of the schema.
+   * //{[propertyName: string]: Schema}
    */
-  static inlineObj = function (props) {
+  static inlineObj = function (props): Schema {
     return {
       properties: props
     };
@@ -190,7 +189,7 @@ class Doc {
    * @param {string} modelName - definition reference
    * @returns {object} - swagger schema
    */
-  static namedModel = function (name, modelName) {
+  static namedModel = function (name: string, modelName: string): Schema {
     return Doc.inlineObj({
       [name]: {
         schema: Doc.model(modelName)
@@ -215,7 +214,7 @@ class Doc {
    * @param {string} modelName - definition reference
    * @returns {object} - swagger schema
    */
-  static namedModelArray = function (name, modelName) {
+  static namedModelArray = function (name: string, modelName: string) {
     return Doc.inlineObj({
       [name]: {
         schema: Doc.arrayOfModel(modelName)
@@ -230,14 +229,19 @@ class Doc {
    * @returns {object} - Swagger Object containing id, and properties with the nested schema.
    */
   static pick = function (modelName: string, prop?: string) {
+    const defaultResponse = {
+      id: prop,
+      properties: {}
+    };
     if (!definitions[modelName] || !definitions[modelName].properties || !prop) {
-      return {
-        id: prop,
-        properties: {}
-      };
+      return defaultResponse;
     }
 
     const def = definitions[modelName].properties;
+
+    if(!def) {
+      return defaultResponse;
+    }
 
     if (def[prop]) {
       return def[prop];
@@ -271,7 +275,9 @@ class Doc {
     this._params = {};
 
     if (Object.keys(this.doc).length === 0) {
-      this.doc.get = {};
+      this.doc.get = {
+        responses: {}
+      };
     }
 
     this.modelName = 'Resource';
@@ -332,6 +338,7 @@ class Doc {
    */
   modelBody(modelName: string) {
     return this.bodyParam({
+      in: 'body',
       name: modelName,
       description: modelName,
       schema: Doc.model(modelName)
@@ -342,13 +349,7 @@ class Doc {
    * Helper for JSON Payload response
    * @param {any} obj - Body sent in JSON Response
    */
-  bodyParam(obj: {
-    required?: boolean;
-    in?: string;
-    description?: string;
-    name: string;
-    schema?: any;
-  }) {
+  bodyParam(obj: BodyParameter) {
     if (typeof obj !== 'object') {
       throw new Error('Obj is required');
     }
@@ -370,9 +371,9 @@ class Doc {
     return this;
   }
 
-  param(obj) {
+  param(obj: Parameter) {
     if (typeof obj !== 'object') {
-      throw new Error('Obj is required');
+      throw new Error('Object is required');
     }
 
     if (!Object.prototype.hasOwnProperty.call(obj, 'required')) {
@@ -402,7 +403,7 @@ class Doc {
    * @param {any[]} arr - Param Array
    * @returns {Doc} - Doc Instance
    */
-  setParams(arr: any[]) {
+  setParams(arr: Parameter[]) {
     this.innerDoc().parameters = arr;
     return this;
   }
@@ -564,8 +565,9 @@ class Doc {
   }
 
   innerDoc(): Operation {
-    const method = Object.keys(this.doc)[0];
-    return this.doc[method];
+    const { doc } = this;
+    const method = Object.keys(doc)[0];
+    return doc[method];
   }
 
   build() {
@@ -590,6 +592,7 @@ class Doc {
     return this.onSuccess(code, param).build();
   }
 
+  // Response
   onSuccess(code, result, useUtil?) {
     // response code optional
     if (typeof code === 'object') {
