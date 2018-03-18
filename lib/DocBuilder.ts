@@ -3,14 +3,18 @@
 import autoBind from 'auto-bind';
 import _ from 'lodash';
 import Doc from './Doc';
-import { Spec, Path } from 'swagger-schema-official';
+import { Spec, Path, Schema } from 'swagger-schema-official';
 
 /**
  * @class
  */
 class DocBuilder {
-  private docs: any;
-  private definitions: any;
+  private docs: {
+    [route: string]: {
+      [method: string]: Path,
+    };
+  };
+  private definitions: { [definitionName: string]: Schema };
   private options: any;
 
   constructor(docs?) {
@@ -33,14 +37,14 @@ class DocBuilder {
     return this.options[key];
   }
 
-  public addDefinitions(obj) {
+  public addDefinitions(obj: { [definitionName: string]: Schema } = {}) {
     const self = this;
     Object.keys(obj).forEach((k) => {
       self.addDefinition(k, obj[k]);
     });
   }
 
-  public addDefinition(path: string, doc) {
+  public addDefinition(path: string, doc: Schema) {
     const self = this;
     if (!self.definitions[path]) {
       self.definitions[path] = {};

@@ -10,9 +10,15 @@ import {
   Parameter,
   Path,
   Response,
+  XML,
+  ExternalDocs,
 } from 'swagger-schema-official';
 
-let definitions: { [definitionsName: string]: Schema } = {};
+export interface IDefitinitions {
+  [definitionsName: string]: Schema;
+}
+
+let definitions: IDefitinitions = {};
 
 /**
  * @class
@@ -23,7 +29,7 @@ class Doc {
    * @param {object} obj - Fully loaded set of stored swagger definitions.
    * @returns {void}
    */
-  public static setDefinitions = (obj): void => {
+  public static setDefinitions = (obj: IDefitinitions): void => {
     definitions = obj;
   }
 
@@ -95,7 +101,7 @@ class Doc {
    * Helper to create a number typed swagger definition object.
    * @returns {object} - Reference to a swagger definition object for a number.
    */
-  public static number = () => {
+  public static number = (): Schema => {
     return {
       type: 'number',
     };
@@ -115,7 +121,7 @@ class Doc {
    * Helper to create a string typed swagger definition object.
    * @returns {object} - Reference to a swagger definition object for a string.
    */
-  public static string = () => {
+  public static string = (): Schema => {
     return {
       type: 'string',
     };
@@ -125,7 +131,7 @@ class Doc {
    * Helper to create a object typed swagger definition object.
    * @returns {object} - Reference to a swagger definition object for an object.
    */
-  public static object = () => {
+  public static object = (): Schema => {
     return {
       type: 'object',
     };
@@ -135,7 +141,7 @@ class Doc {
    * Helper to create a date typed swagger definition object.
    * @returns {object} - Reference to a swagger definition object for a date.
    */
-  public static date = () => {
+  public static date = (): Schema => {
     return {
       format: 'date',
       type: 'string',
@@ -146,7 +152,7 @@ class Doc {
    * Helper to create a bool typed swagger definition object.
    * @returns {object} - Reference to a swagger definition object for a bool.
    */
-  public static bool = () => {
+  public static bool = (): Schema => {
     return {
       type: 'boolean',
     };
@@ -157,7 +163,7 @@ class Doc {
    * @param {object} type - Type of primitive to create an array of.
    * @returns {object} - Reference to a swagger definition object for an array of a primitive type.
    */
-  public static arrayOfType = (type: string) => {
+  public static arrayOfType = (type: string): Schema => {
     return {
       items: {
         type,
@@ -173,17 +179,18 @@ class Doc {
    * @param {object} obj - Swagger schema object.
    * @returns {object} - Cloned/Modified Swagger Object
    */
-  public static extend = (modelName: string, obj) => {
+  public static extend = (modelName: string, obj: IDefitinitions): Schema => {
     if (!definitions[modelName]) {
       return {
-        id: modelName,
+        // id: modelName,
         properties: obj,
       };
     }
 
-    return Object.assign({}, definitions[modelName], {
-      properties: Object.assign({}, definitions[modelName].properties, obj),
-    });
+    return {
+      ...definitions[modelName],
+      properties: { ...definitions[modelName].properties, ...obj }
+    };
   }
 
   /**
@@ -194,20 +201,16 @@ class Doc {
    */
   public static namedModel = (name: string, modelName: string): Schema => {
     return Doc.inlineObj({
-      [name]: {
-        schema: Doc.model(modelName),
-      },
+      [name]: Doc.model(modelName),
     });
   }
 
   /**
    * Generic function to wrap a schema in an envelope
    */
-  public static wrap = (name, schema) => {
+  public static wrap = (name: string, schema: Schema): Schema => {
     return Doc.inlineObj({
-      [name]: {
-        schema,
-      },
+      [name]: schema
     });
   }
 
@@ -219,9 +222,7 @@ class Doc {
    */
   public static namedModelArray = (name: string, modelName: string): Schema => {
     return Doc.inlineObj({
-      [name]: {
-        schema: Doc.arrayOfModel(modelName),
-      },
+      [name]: Doc.arrayOfModel(modelName)
     });
   }
 
@@ -269,12 +270,12 @@ class Doc {
    * Retrieve swagger definitions from the node module cache in static js.
    * @returns {object} - Hashmap of swagger definitions
    */
-  public static getDefinitions = () => {
+  public static getDefinitions = (): IDefitinitions => {
     return definitions;
   }
 
-  private doc: Path;
-  private _params: { [key: string]: Parameter };
+  public doc: Path;
+  public _params: { [key: string]: Parameter };
   private modelName: string;
 
   constructor(doc = {}) {
@@ -586,33 +587,46 @@ class Doc {
     return _.cloneDeep(this.doc);
   }
 
-  public onSuccessUseUtil(code: number, result) {
-    return this.onSuccess(code, result, true);
+  public onSuccessUseUtil(code: number | Response, result?: Response) {
+    const self = this;
+    if (!result || typeof code !== 'number') {
+      result = code as Response;
+      code = 200;
+    }
+    return self.onSuccess(code, result, true);
   }
 
-  public okAndBuild(schema, code: number) {
-    code = code || 200;
-    const param = schema.schema ? schema : { schema };
+  public okAndBuild(schema: Schema, code: number = 200) {
+    const param: Response = {
+      description: 'Response',
+      schema,
+    };
     return this.onSuccess(code, param).build();
   }
 
-  public wrapOkAndBuild(name: string, schema, code?: number) {
-    code = code || 200;
-    const massagedSchema = schema.schema ? schema : { schema };
-    const param = Doc.wrap(name, massagedSchema);
-    return this.onSuccess(code, param).build();
+  public wrapOkAndBuild(name: string, schema: Schema, code: number = 200) {
+    const param = Doc.wrap(name, schema);
+    return this.onSuccess(code, {
+      description: 'Response',
+      schema: param,
+    }).build();
   }
 
   // Response
-  public onSuccess(code, result, useUtil?: boolean) {
+  public onSuccess(code: number | Response, result: Response | boolean, useUtil: boolean = false) {
+    const obj: Operation = this.innerDoc();
+
     // response code optional
     if (typeof code === 'object') {
-      useUtil = result;
-      result = code;
+      useUtil = typeof result === 'boolean' ? result : false;
+      result = code as Response;
       code = 200;
     }
 
-    const obj: Operation = this.innerDoc();
+    // escape for type safety
+    if (typeof result === 'boolean') {
+      return this;
+    }
 
     if (obj.responses) {
       Object.keys(obj.responses).forEach((k: string) => {
@@ -628,9 +642,9 @@ class Doc {
     obj.responses[code] = _.cloneDeep(result);
 
     if (useUtil) {
-      const props: any = {
+      const props: Schema = {
         title: 'data',
-        type: result.type,
+        // type: result.type,
       };
 
       const schema: Schema = {
@@ -653,11 +667,16 @@ class Doc {
 
       obj.responses[code].schema = schema;
 
+      if (!result.schema) {
+        return this;
+      }
       if (result.schema.type === 'array') {
         props.type = 'array';
         props.items = result.schema.items;
       } else {
-        props.schema = result.schema;
+        if (schema.properties) {
+          schema.properties.data = result.schema;
+        }
       }
     }
 

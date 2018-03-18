@@ -4,6 +4,7 @@
 import Doc from './Doc';
 import DocBuilder from './DocBuilder';
 import paramGroups from './paramGroups';
+import { Parameter } from 'swagger-schema-official';
 
 export class Doctopus {
   public Doc = Doc;
@@ -24,7 +25,7 @@ export class Doctopus {
     return this;
   }
 
-  public paramGroup(name: string, schema?) {
+  public paramGroup(name: string, schema?: { [key: string]: Parameter}) {
     if (schema && typeof schema !== 'object') {
       throw new Error('The 2nd parameter to `doctopus.paramGroup()` should be a ' +
         'swagger schema');

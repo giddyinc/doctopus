@@ -6,6 +6,7 @@ import sinon from 'sinon';
 
 import doctopus from '.';
 import Doc from './Doc';
+import { Schema } from 'swagger-schema-official';
 
 /**
  * mocha lib/Doc.test.ts --opts .mocharc --watch
@@ -13,9 +14,10 @@ import Doc from './Doc';
 
 describe(path.basename(__filename).replace('.test.js', ''), () => {
   let sandbox;
-  let doc;
-  const description = 'das cat';
-  const model = 'Cat';
+  let doc: Doc;
+  const description: string = 'das cat';
+  const model: string = 'Cat';
+  const log = (obj: any) => console.log(JSON.stringify(obj, null, 2));
 
   before(() => {
     doc = new Doc({
@@ -121,12 +123,35 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
       const result = doc.build();
       expect(result.post.responses).toExist();
       expect(result.post.responses['200']).toExist();
+      const response = result.post.responses['200'];
+      expect(response.schema.properties.metadata.properties.status.type).toExist();
+      // log(response);
+    });
+    it('onSuccess - with Util - no code', () => {
+      doc.onSuccess(objResponse, true);
+      const result = doc.build();
+      expect(result.post.responses).toExist();
+      expect(result.post.responses['200']).toExist();
+      const response = result.post.responses['200'];
+      expect(response.schema.properties.metadata.properties.status.type).toExist();
+      // log(response);
+    });
+    it('onSuccess - with Util off - no code', () => {
+      doc.onSuccess(objResponse, false);
+      const result = doc.build();
+      expect(result.post.responses).toExist();
+      expect(result.post.responses['200']).toExist();
+      const response = result.post.responses['200'];
+      // log(response);
+      expect(response.schema.properties).toNotExist();
     });
     it('onSuccessUseUtil - with Util - with code', () => {
       doc.onSuccessUseUtil(201, objResponse);
       const result = doc.build();
       expect(result.post.responses).toExist();
       expect(result.post.responses['201']).toExist();
+      const response = result.post.responses['201'];
+      expect(response.schema.properties.metadata.properties.status.type).toExist();
     });
   });
 
@@ -144,6 +169,8 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
 
   it('should be able to set group', () => {
     doc.param({
+      in: 'path',
+      type: 'string',
       name: 'foo',
     });
     expect(doc._params.foo).toExist();
@@ -174,8 +201,9 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
   });
 
   it('should add', () => {
-    doc.add('foo', 'bar');
-    expect(doc.doc.foo === 'bar');
+    doc.add('description', 'sup');
+    const { doc: inner } = doc;
+    expect(inner.post.description).toExist();
   });
 
   describe('params', () => {
@@ -188,7 +216,8 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
 
     it('bodyParam', () => {
       const result = doc.bodyParam({
-        // name: 'foo'
+        in: 'body',
+        name: 'Body',
       });
       expect(result._params.Body.in).toBe('body');
     });
@@ -261,7 +290,7 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
     it('arrayOfType', () => {
       const result = Doc.arrayOfType('string');
       expect(result.type === 'array');
-      expect(result.items.type === 'string');
+      expect((result.items as Schema).type === 'string');
     });
     ['object', 'string', 'number'].forEach((x) => {
       it(x, () => {
@@ -298,15 +327,17 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
 
     it('namedModel', () => {
       const result = Doc.namedModel('cat', model);
-      expect(result.properties.cat.schema.$ref).toEqual('#/definitions/Cat');
+      expect(result.properties.cat.$ref).toEqual('#/definitions/Cat');
     });
     it('wrap', () => {
       const result = Doc.wrap('cat', Doc.model('Cat'));
-      expect(result.properties.cat.schema.$ref).toEqual('#/definitions/Cat');
+      expect(result.properties.cat.$ref).toEqual('#/definitions/Cat');
     });
+
     it('namedModelArray', () => {
       const result = Doc.namedModelArray('cats', model);
-      expect(result.properties.cats.schema.items.$ref).toEqual('#/definitions/Cat');
+      // log(result);
+      expect((result.properties.cats.items as Schema).$ref).toEqual('#/definitions/Cat');
     });
 
     it('withParamGroup', () => {
@@ -323,7 +354,7 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
     it('arrayOfType', () => {
       const result = Doc.arrayOfModel('string');
       expect(result.type === 'array');
-      expect(result.items.$ref).toExist();
+      expect((result.items as Schema).$ref).toExist();
     });
   });
 
@@ -377,6 +408,7 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
         },
       },
     };
+
     beforeEach(() => Doc.setDefinitions(defs));
 
     it('should return a default', () => {
@@ -408,9 +440,10 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
   describe('wrapOkAndBuild', () => {
     it('should wrap', () => {
       const result = doc.wrapOkAndBuild('cat', Doc.string());
+      // log(result);
       const key = Object.keys(result)[0];
       expect(result[key].responses).toExist();
-      expect(result[key].responses['200'].properties.cat.schema).toExist();
+      expect(result[key].responses['200'].schema.properties.cat.type).toExist();
     });
   });
 });

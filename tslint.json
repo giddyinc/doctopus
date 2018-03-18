@@ -6,6 +6,10 @@
     "radix": false,
     "ordered-imports": false,
     "variable-name": false,
-    "object-literal-sort-keys": false
+    "object-literal-sort-keys": false,
+    "prefer-destructuring": true,
+    "prefer-object-spread": true,
+    "no-console": false,
+    "trailing-comma": false
   }
 }
