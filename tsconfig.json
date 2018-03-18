@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "allowJs": false,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "lib": [
+      "es2017"
+    ],
+    "target": "es5",
+    "strict": true,
+    "outDir": "./dist",
+    "preserveConstEnums": true,
+    "removeComments": true,
+    "inlineSourceMap": false,
+    "noImplicitAny": false,
+    "typeRoots": [
+      "./node_modules/@types"
+    ]
+  },
+  "include": [
+    "lib/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.test.ts",
+    "gulpfile"
+  ]
+}

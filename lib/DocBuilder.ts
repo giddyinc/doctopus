@@ -1,21 +1,30 @@
 'use strict';
 
-const _ = require('lodash');
-const Doc = require('./Doc');
-const autoBind = require('auto-bind');
+import autoBind from 'auto-bind';
+import _ from 'lodash';
+import Doc from './Doc';
+import { Spec, Path, Schema } from 'swagger-schema-official';
 
 /**
  * @class
  */
 class DocBuilder {
-  constructor(docs) {
+  private docs: {
+    [route: string]: {
+      [method: string]: Path,
+    };
+  };
+  private definitions: { [definitionName: string]: Schema };
+  private options: any;
+
+  constructor(docs?) {
     this.docs = docs || {};
     autoBind(this);
     this.definitions = {};
     this.options = {};
   }
 
-  set(key, value) {
+  public set(key, value) {
     if (arguments.length === 1) {
       return this.options[key];
     }
@@ -24,18 +33,18 @@ class DocBuilder {
     return this;
   }
 
-  get(key) {
+  public get(key) {
     return this.options[key];
   }
 
-  addDefinitions(obj) {
+  public addDefinitions(obj: { [definitionName: string]: Schema } = {}) {
     const self = this;
-    Object.keys(obj).forEach(k => {
+    Object.keys(obj).forEach((k) => {
       self.addDefinition(k, obj[k]);
     });
   }
 
-  addDefinition(path, doc) {
+  public addDefinition(path: string, doc: Schema) {
     const self = this;
     if (!self.definitions[path]) {
       self.definitions[path] = {};
@@ -43,7 +52,7 @@ class DocBuilder {
     Object.assign(self.definitions[path], doc);
   }
 
-  add(path, doc) {
+  public add(path: string, doc: Path) {
     const self = this;
     if (!self.docs[path]) {
       self.docs[path] = {};
@@ -51,21 +60,23 @@ class DocBuilder {
     Object.assign(self.docs[path], doc);
   }
 
-  build() {
-    const spec = {
+  public build(): Spec {
+    const { definitions, docs, options } = this;
+    const spec: Spec = {
+      definitions,
+      host: '',
       info: {
-        title: this.options.title || 'Title', // Title (required)
-        version: this.options.version || '1.0.0' // Version (required)
+        title: options.title || 'Title', // Title (required)
+        version: options.version || '1.0.0', // Version (required)
       },
-      tags: [],
+      paths: docs,
+      securityDefinitions: {},
       swagger: '2.0',
-      securityDefitions: {},
-      paths: this.docs,
-      definitions: this.definitions
+      tags: [],
     };
 
-    if (this.options.host) {
-      spec.host = this.options.host;
+    if (options.host) {
+      spec.host = options.host;
     }
 
     return _.cloneDeep(spec);
@@ -75,7 +86,7 @@ class DocBuilder {
    * Clears the cached docs.
    * @returns {void}
    */
-  clear() {
+  public clear(): void {
     this.docs = {};
   }
 
@@ -85,7 +96,7 @@ class DocBuilder {
    * @param {string} modelName - Mongoose Model Name
    * @returns {Doc} - Doc Factory Instance
    */
-  getFactory(namespace, modelName) {
+  public getFactory(namespace, modelName: string) {
     const factory = new Doc();
     factory.group(namespace);
     if (modelName) {
@@ -95,4 +106,4 @@ class DocBuilder {
   }
 }
 
-module.exports = DocBuilder;
+export default DocBuilder;

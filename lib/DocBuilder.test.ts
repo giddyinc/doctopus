@@ -1,19 +1,19 @@
 'use strict';
 
-const path = require('path');
-const expect = require('expect');
-const sinon = require('sinon');
-const Doc = require('./Doc');
-const DocBuilder = require('./DocBuilder');
+import path from 'path';
+import expect from 'expect';
+import sinon, { SinonSandbox } from 'sinon';
+
+import Doc from './Doc';
+import DocBuilder from './DocBuilder';
+import { Path } from 'swagger-schema-official';
 
 /**
- * helper: lib/DocBuilder.test.js
- * mocha lib/DocBuilder.test.js --watch
- * istanbul cover --print both node_modules/.bin/_mocha -- lib/DocBuilder.test.js
+ * mocha lib/DocBuilder.test.ts --opts .mocharc --watch
  */
 
 describe(path.basename(__filename).replace('.test.js', ''), () => {
-  let sandbox;
+  let sandbox: SinonSandbox;
   let docBuilder;
 
   beforeEach(() => {
@@ -36,11 +36,11 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
   it('add', () => {
     const db = new DocBuilder({});
     db.add('foo', {
-      post: {}
-    });
+      post: {},
+    } as Path);
     db.add('foo', {
-      get: {}
-    });
+      get: {},
+    } as Path);
     const result = db.build();
     expect(result.paths.foo.post).toEqual({});
   });
@@ -57,7 +57,7 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
   });
 
   const tale = {
-    text: 'story bro'
+    text: 'story bro',
   };
   it('addDefinition', () => {
     docBuilder.addDefinition('cool', tale);
@@ -66,7 +66,7 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
   it('addDefinitions', () => {
     const tales = {
       tale,
-      foo: 'bar'
+      foo: 'bar',
     };
     sandbox.stub(docBuilder, 'addDefinition');
     docBuilder.addDefinitions(tales);
