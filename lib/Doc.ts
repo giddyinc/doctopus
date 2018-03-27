@@ -587,6 +587,21 @@ class Doc {
     return _.cloneDeep(this.doc);
   }
 
+  public response(response: Response, options: { code?: number } = {}): this {
+    const doc: Operation = this.innerDoc();
+    const {
+      code = 200
+    } = options;
+
+    doc.responses[code] = response;
+
+    return this;
+  }
+
+  public success(response: Response, options: { code?: number } = {}): this {
+    return this.response(response, options);
+  }
+
   public onSuccessUseUtil(code: number | Response, result?: Response) {
     const self = this;
     if (!result || typeof code !== 'number') {
