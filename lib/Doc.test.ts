@@ -3,7 +3,7 @@
 import path from 'path';
 import expect from 'expect';
 import sinon from 'sinon';
-
+import chai from 'chai';
 import doctopus from '.';
 import Doc from './Doc';
 import { Schema } from 'swagger-schema-official';
@@ -21,7 +21,9 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
 
   before(() => {
     doc = new Doc({
-      post: {},
+      post: {
+        responses: {}
+      },
     });
 
     doctopus.paramGroup('foo', {
@@ -297,6 +299,29 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
         const result = Doc[x]();
         expect(result.type === x);
       });
+    });
+
+    it('string', () => {
+      const { expect } = chai;
+      const schema = Doc.string();
+
+      expect(
+        JSON.parse(JSON.stringify(schema))
+      ).to.deep.equal({
+        type: 'string'
+      });
+
+      const schema2 = Doc.string({
+        default: 'foo'
+      });
+
+      expect(
+        JSON.parse(JSON.stringify(schema2))
+      ).to.deep.equal({
+        type: 'string',
+        default: 'foo'
+      });
+
     });
 
     it('date', () => {

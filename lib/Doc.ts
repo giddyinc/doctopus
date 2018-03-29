@@ -14,6 +14,9 @@ import {
   ExternalDocs,
 } from 'swagger-schema-official';
 
+import DocBuilder from './DocBuilder';
+import { SchemaBuilder } from './SchemaBuilder';
+
 export interface IDefitinitions {
   [definitionsName: string]: Schema;
 }
@@ -91,10 +94,10 @@ class Doc {
    * @returns {object} - Reference to a swagger definition object of the schema.
    * //{[propertyName: string]: Schema}
    */
-  public static inlineObj = (props): Schema => {
-    return {
+  public static inlineObj = (props): SchemaBuilder => {
+    return new SchemaBuilder({
       properties: props,
-    };
+    });
   }
 
   /**
@@ -121,10 +124,11 @@ class Doc {
    * Helper to create a string typed swagger definition object.
    * @returns {object} - Reference to a swagger definition object for a string.
    */
-  public static string = (): Schema => {
-    return {
+  public static string = (opts?): SchemaBuilder => {
+    return new SchemaBuilder({
+      ...opts,
       type: 'string',
-    };
+    });
   }
 
   /**
@@ -274,11 +278,13 @@ class Doc {
     return definitions;
   }
 
-  public doc: Path;
   public _params: { [key: string]: Parameter };
+  public isDoctopus: boolean = true;
   private modelName: string;
+  private builder?: DocBuilder;
+  private _route?: string;
 
-  constructor(doc = {}) {
+  constructor(public doc: Path = {}) {
     this.doc = doc;
     this._params = {};
 
@@ -292,6 +298,16 @@ class Doc {
 
     autoBind(this);
     this.json(); // default
+  }
+
+  public setRoute(route: string): this {
+    this._route = route;
+    return this;
+  }
+
+  public setBuilder(builder: DocBuilder): this {
+    this.builder = builder;
+    return this;
   }
 
   /**
@@ -582,9 +598,31 @@ class Doc {
     return doc[method];
   }
 
-  public build() {
-    this.setParams(_.values(this._params));
-    return _.cloneDeep(this.doc);
+  public build(): Path {
+    const {
+      _params,
+      _route,
+      builder,
+      doc: _doc
+    } = this;
+
+    this.setParams(_.values(_params));
+
+    const doc: Path = _.cloneDeep(_doc);
+
+    if (builder) {
+      if (!_route) {
+        throw new TypeError('Lazy build requires route to be set through DocBuilder');
+      }
+      builder.add(_route, doc);
+      return doc;
+    }
+
+    return doc;
+  }
+
+  public commit(): Path {
+    return this.build();
   }
 
   public response(response: Response, options: { code?: number } = {}): this {

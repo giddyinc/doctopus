@@ -31,6 +31,7 @@
     "@types/node": "^8.0.34",
     "@types/sinon": "4.3.0",
     "@types/swagger-schema-official": "2.0.9",
+    "chai": "4.1.2",
     "clarify": "^2.0.0",
     "coveralls": "3.0.0",
     "del": "^2.0.2",

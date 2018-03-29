@@ -52,11 +52,19 @@ class DocBuilder {
     Object.assign(self.definitions[path], doc);
   }
 
-  public add(path: string, doc: Path) {
+  public add(path: string, doc: Path | Doc = new Doc()) {
     const self = this;
+
+    if (isDoctopus(doc)) {
+      return doc
+        .setRoute(path)
+        .setBuilder(this);
+    }
+
     if (!self.docs[path]) {
       self.docs[path] = {};
     }
+
     Object.assign(self.docs[path], doc);
   }
 
@@ -107,3 +115,7 @@ class DocBuilder {
 }
 
 export default DocBuilder;
+
+function isDoctopus(e: any): e is Doc {
+  return e.isDoctopus === true;
+}

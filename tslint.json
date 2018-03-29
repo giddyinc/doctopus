@@ -10,6 +10,7 @@
     "prefer-destructuring": true,
     "prefer-object-spread": true,
     "no-console": false,
-    "trailing-comma": false
+    "trailing-comma": false,
+    "no-shadowed-variable": false
   }
 }
