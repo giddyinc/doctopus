@@ -12,6 +12,7 @@ import {
   Response,
   XML,
   ExternalDocs,
+  Header,
 } from 'swagger-schema-official';
 
 import DocBuilder from './DocBuilder';
@@ -94,10 +95,10 @@ class Doc {
    * @returns {object} - Reference to a swagger definition object of the schema.
    * //{[propertyName: string]: Schema}
    */
-  public static inlineObj = (props): SchemaBuilder => {
-    return new SchemaBuilder({
+  public static inlineObj = (props): Schema => {
+    return {
       properties: props,
-    });
+    };
   }
 
   /**
@@ -124,11 +125,11 @@ class Doc {
    * Helper to create a string typed swagger definition object.
    * @returns {object} - Reference to a swagger definition object for a string.
    */
-  public static string = (opts?): SchemaBuilder => {
-    return new SchemaBuilder({
+  public static string = (opts?): Schema => {
+    return {
       ...opts,
       type: 'string',
-    });
+    };
   }
 
   /**
@@ -631,8 +632,9 @@ class Doc {
       code = 200
     } = options;
 
-    doc.responses[code] = response;
+    // const _response: Response = isIResponse(response) ? toResponse(response) : response;
 
+    doc.responses[code] = response;
     return this;
   }
 
@@ -659,6 +661,9 @@ class Doc {
 
   public wrapOkAndBuild(name: string, schema: Schema, code: number = 200) {
     const param = Doc.wrap(name, schema);
+    // if (isSchemaBuilder(param)) {
+    //   param = param.toSchema();
+    // }
     return this.onSuccess(code, {
       description: 'Response',
       schema: param,
@@ -734,8 +739,33 @@ class Doc {
     }
 
     return this;
-
   }
 }
 
 export default Doc;
+
+function isSchemaBuilder(e: any): e is SchemaBuilder {
+  return e instanceof SchemaBuilder;
+}
+
+function isIResponse(e: any): e is IResponse {
+  return isSchemaBuilder(e.schema);
+}
+
+export interface IResponse {
+  description: string;
+  schema: SchemaBuilder;
+  headers?: { [headerName: string]: Header };
+  examples?: { [exampleName: string]: {} };
+}
+
+const toResponse = (iRes: IResponse): Response => {
+  return {
+    description: iRes.description,
+    schema: iRes.schema.toSchema(),
+    headers: iRes.headers,
+    examples: iRes.examples
+  };
+};
+
+export type ISchema = Schema | SchemaBuilder;

@@ -81,9 +81,10 @@ describe('doctopus', () => {
       const schema = Doc.inlineObj({
         cat: Doc.model('Cat'),
         token: Doc.string()
-      }).requiredFields(['token']);
+      });
+      // .requiredFields(['token']);
 
-      console.log(schema);
+      // console.log(schema);
 
       docs.add('/v1/cats')
         .get()
