@@ -11,6 +11,7 @@
     "prefer-object-spread": true,
     "no-console": false,
     "trailing-comma": false,
-    "no-shadowed-variable": false
+    "no-shadowed-variable": false,
+    "no-unused-expression": false
   }
 }

@@ -24,6 +24,7 @@
     "apis"
   ],
   "devDependencies": {
+    "@types/chai": "4.1.2",
     "@types/expect": "1.20.3",
     "@types/gulp": "4.0.5",
     "@types/lodash": "^4.14.77",

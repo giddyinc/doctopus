@@ -1,18 +1,24 @@
 
 import { Schema } from 'swagger-schema-official';
 
-export class SchemaBuilder implements Schema {
-  public format?: string;
-  public title?: string;
-  public description?: string;
-  public default?: string | boolean | number | {};
-  public multipleOf?: number;
-  public maximum?: number;
-  public exclusiveMaximum?: number;
-  public minimum?: number;
-  public exclusiveMinimum?: number;
-  public maxLength?: number;
-  public minLength?: number;
+export const privateFields = [
+  'required',
+  'default',
+  'readOnly',
+  'format',
+  'title',
+  'description',
+  'multipleOf',
+  'maximum',
+  'exclusiveMaximum',
+  'minimum',
+  'exclusiveMinimum',
+  'maxLength',
+  'minLength',
+];
+
+export class SchemaBuilder {
+
   public pattern?: string;
   public maxItems?: number;
   public minItems?: number;
@@ -27,12 +33,39 @@ export class SchemaBuilder implements Schema {
   public additionalProperties?: Schema;
   public properties?: { [propertyName: string]: Schema };
   public discriminator?: string;
-  public readOnly?: boolean;
   public example?: { [exampleName: string]: {} };
-  public required?: string[];
+  private _format?: string;
+  private _title?: string;
+  private _description?: string;
+  private _multipleOf?: number;
+  private _maximum?: number;
+  private _exclusiveMaximum?: number;
+  private _minimum?: number;
+  private _exclusiveMinimum?: number;
+  private _maxLength?: number;
+  private _minLength?: number;
+  private _default?: string | boolean | number | {};
+  private _required?: string[];
+  private _readOnly?: boolean;
 
   constructor(schema: Schema = {}) {
-    Object.assign(this, schema);
+    const proxy = new Proxy(this, handler);
+    Object.assign(proxy, schema);
+    return proxy;
+  }
+
+  public toSchema(): Schema {
+    const self: any = this;
+    return privateFields.reduce((acc, f) => {
+      const _f = `_${f}`;
+      acc[f] = self[_f];
+      delete acc[_f];
+      return acc;
+    }, { ...self });
+  }
+
+  public toJSON() {
+    return this.toSchema();
   }
 
   // schemas have an array of required properties on them.
@@ -43,7 +76,7 @@ export class SchemaBuilder implements Schema {
 
   // Set the fields of the schema that are required.
   public requiredFields(fields: string[]): this {
-    this.required = fields;
+    this._required = fields;
     return this;
   }
 
@@ -52,4 +85,30 @@ export class SchemaBuilder implements Schema {
     return this;
   }
 
+  public default(def: string | boolean | number | {}) {
+    this._default = def;
+  }
+
+  public readOnly(setting: boolean = true): this {
+    this._readOnly = setting;
+    return this;
+  }
 }
+
+export const privateFieldsMap = privateFields.reduce((acc, f) => {
+  acc[f] = `_${f}`;
+  return acc;
+}, {});
+
+/**
+ * Allows properties to be set directly in the constructor.
+ */
+const handler = {
+  set(obj, prop, value) {
+    const privateField = privateFieldsMap[prop];
+    if (privateField) {
+      return Reflect.set(obj, privateField, value);
+    }
+    return Reflect.set(obj, prop, value);
+  }
+};
