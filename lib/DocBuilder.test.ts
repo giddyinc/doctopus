@@ -42,7 +42,14 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
       get: {},
     } as Path);
     const result = db.build();
-    expect(result.paths.foo.post).toEqual({});
+    expect(result.paths.foo.post).toEqual({
+      produces: [
+        'application/json'
+      ]
+    });
+    
+    db.add('bar').post().build();
+    expect(db.build().paths.bar.post.produces).toExist();
   });
 
   it('clear', () => {

@@ -1,22 +1,26 @@
 'use strict';
 
-import _ from 'lodash';
+import cloneDeep from 'lodash.clonedeep';
 import autoBind from 'auto-bind';
 import paramGroups from './paramGroups';
 import {
   Schema,
-  Operation, BaseSchema,
-  BodyParameter, BaseParameter, PathParameter,
+  Operation,
+  BodyParameter, 
+  PathParameter,
   Parameter,
   Path,
   Response,
   XML,
   ExternalDocs,
   Header,
+  FormDataParameter,
+  HeaderParameter,
+  QueryParameter,
 } from 'swagger-schema-official';
 
 import DocBuilder from './DocBuilder';
-import { SchemaBuilder } from './SchemaBuilder';
+import { SchemaBuilder, IProperties } from './SchemaBuilder';
 
 export interface IDefitinitions {
   [definitionsName: string]: Schema;
@@ -41,8 +45,9 @@ class Doc {
    * @param {string} modelName - Name of the mongoose model.
    * @returns {object} - Reference to a swagger array object of the mongoose model schema.
    */
-  public static arrayOfModel = (modelName: string): Schema => {
+  public static arrayOfModel = (modelName: string, opts: Schema = {}): Schema => {
     return {
+      ...opts,
       items: {
         $ref: `#/definitions/${modelName}`,
       },
@@ -54,37 +59,61 @@ class Doc {
    * @param {string} modelName - Name of the mongoose model.
    * @returns {object} - Reference to a swagger definition object of the mongoose model schema.
    */
-  public static model = (modelName: string): Schema => {
+  public static model = (modelName: string, opts: Schema = {}): Schema => {
     return {
+      ...opts,
       $ref: `#/definitions/${modelName}`,
     };
   }
 
   /**
-   * Combines a parameter group with a swagger schema object to create a composite schema.
+   * Overlays a parameter group onto a swagger schema to create a composite schema.
+   * (for when query params are in a request body)
    * @param {string} name - Parameter group name (see Documentation/paramgroups).
    * @param {object} arg? - Swagger schema object to merge.
    * @returns {object} - Reference to a swagger definition object schema.
    */
-  public static withParamGroup = (name: string, arg?) => {
-    const group = paramGroups[name];
-    if (!group) {
-      return {};
-    }
-    _.values(group).forEach((x) => {
-      arg.properties[x.name] = {
-        type: x.type,
-      };
+  public static withParamGroup = (name: string, schema: Schema = {}) => {
+    const group: IParamGroup = paramGroups[name] || {};
+    const {
+      properties = {}
+    } = schema;
+
+    Object.values(group).forEach((parameter: Parameter) => {
+      if (isBodyParam(parameter)) {
+        const { schema: paramSchema = {} } = parameter;
+        schema.properties = {
+          ...properties,
+          [parameter.name]: {
+            ...paramSchema,
+            title: parameter.name,
+            description: parameter.description,
+          }
+        };
+      }
+
+      if (isNonBodyParam(parameter)) {
+        schema.properties = {
+          ...properties,
+          [parameter.name]: {
+            title: parameter.name,
+            description: parameter.description,
+            type: parameter.type
+          }
+        };
+      }
     });
-    return arg;
+
+    return schema;
   }
 
   /**
    * @param {object} schema - Schema to wrap in a swagger array.
    * @returns {object} - Reference to a swagger definition object of the schema array.
    */
-  public static arrayOf = (schema: Schema): Schema => {
+  public static arrayOf = (schema: Schema, opts: Schema = {}): Schema => {
     return {
+      ...opts,
       items: schema,
       type: 'array',
     };
@@ -95,8 +124,9 @@ class Doc {
    * @returns {object} - Reference to a swagger definition object of the schema.
    * //{[propertyName: string]: Schema}
    */
-  public static inlineObj = (props): Schema => {
+  public static inlineObj = (props: IProperties, opts: Schema = {}): Schema => {
     return {
+      ...opts,
       properties: props,
     };
   }
@@ -105,8 +135,9 @@ class Doc {
    * Helper to create a number typed swagger definition object.
    * @returns {object} - Reference to a swagger definition object for a number.
    */
-  public static number = (): Schema => {
+  public static number = (opts: Schema = {}): Schema => {
     return {
+      ...opts,
       type: 'number',
     };
   }
@@ -115,8 +146,9 @@ class Doc {
    * Helper to create a file typed swagger definition object.
    * @returns {object} - Reference to a swagger definition object for a file.
    */
-  public static file = () => {
+  public static file = (opts: Schema = {}) => {
     return {
+      ...opts,
       type: 'file',
     };
   }
@@ -125,19 +157,23 @@ class Doc {
    * Helper to create a string typed swagger definition object.
    * @returns {object} - Reference to a swagger definition object for a string.
    */
-  public static string = (opts?): Schema => {
+  public static string = (opts: Schema = {}): Schema => {
     return {
       ...opts,
       type: 'string',
     };
   }
 
+
+  public static schema = (schema: Schema = {}): SchemaBuilder => new SchemaBuilder(schema);
+
   /**
    * Helper to create a object typed swagger definition object.
    * @returns {object} - Reference to a swagger definition object for an object.
    */
-  public static object = (): Schema => {
+  public static object = (opts: Schema = {}): Schema => {
     return {
+      ...opts,
       type: 'object',
     };
   }
@@ -146,8 +182,9 @@ class Doc {
    * Helper to create a date typed swagger definition object.
    * @returns {object} - Reference to a swagger definition object for a date.
    */
-  public static date = (): Schema => {
+  public static date = (opts: Schema = {}): Schema => {
     return {
+      ...opts,
       format: 'date',
       type: 'string',
     };
@@ -157,8 +194,9 @@ class Doc {
    * Helper to create a bool typed swagger definition object.
    * @returns {object} - Reference to a swagger definition object for a bool.
    */
-  public static bool = (): Schema => {
+  public static bool = (opts: Schema = {}): Schema => {
     return {
+      ...opts,
       type: 'boolean',
     };
   }
@@ -168,8 +206,9 @@ class Doc {
    * @param {object} type - Type of primitive to create an array of.
    * @returns {object} - Reference to a swagger definition object for an array of a primitive type.
    */
-  public static arrayOfType = (type: string): Schema => {
+  public static arrayOfType = (type: string, opts: Schema = {}): Schema => {
     return {
+      ...opts,
       items: {
         type,
       },
@@ -184,9 +223,10 @@ class Doc {
    * @param {object} obj - Swagger schema object.
    * @returns {object} - Cloned/Modified Swagger Object
    */
-  public static extend = (modelName: string, obj: IDefitinitions): Schema => {
+  public static extend = (modelName: string, obj: IDefitinitions, opts: Schema = {}): Schema => {
     if (!definitions[modelName]) {
       return {
+        ...opts,
         // id: modelName,
         properties: obj,
       };
@@ -194,7 +234,8 @@ class Doc {
 
     return {
       ...definitions[modelName],
-      properties: { ...definitions[modelName].properties, ...obj }
+      properties: { ...definitions[modelName].properties, ...obj },
+      ...opts
     };
   }
 
@@ -204,19 +245,19 @@ class Doc {
    * @param {string} modelName - definition reference
    * @returns {object} - swagger schema
    */
-  public static namedModel = (name: string, modelName: string): Schema => {
+  public static namedModel = (name: string, modelName: string, opts: Schema = {}): Schema => {
     return Doc.inlineObj({
       [name]: Doc.model(modelName),
-    });
+    }, opts);
   }
 
   /**
    * Generic function to wrap a schema in an envelope
    */
-  public static wrap = (name: string, schema: Schema): Schema => {
+  public static wrap = (name: string, schema: Schema, opts: Schema = {}): Schema => {
     return Doc.inlineObj({
       [name]: schema
-    });
+    }, opts);
   }
 
   /**
@@ -225,10 +266,10 @@ class Doc {
    * @param {string} modelName - definition reference
    * @returns {object} - swagger schema
    */
-  public static namedModelArray = (name: string, modelName: string): Schema => {
+  public static namedModelArray = (name: string, modelName: string, opts: Schema = {}): Schema => {
     return Doc.inlineObj({
       [name]: Doc.arrayOfModel(modelName)
-    });
+    }, opts);
   }
 
   /**
@@ -301,6 +342,19 @@ class Doc {
     this.json(); // default
   }
 
+  public assign(props: object): this {
+    const doc = this.innerDoc();
+    Object.assign(doc, props);
+    return this;
+  }
+
+  public set(key: string | object, props: any = {}): this {
+    if (isString(key)) {
+      return this.assign({ [key]: props });
+    }
+    return this.assign(key);
+  }
+
   public setRoute(route: string): this {
     this._route = route;
     return this;
@@ -330,9 +384,9 @@ class Doc {
   }
 
   public paramGroup(name: string) {
-    const schema = paramGroups[name];
+    const schema: Schema = paramGroups[name] || {};
     if (schema) {
-      _.values(schema).forEach((param) => this.param(param));
+      Object.values(schema).forEach(this.param.bind(this));
     }
     return this;
   }
@@ -379,20 +433,32 @@ class Doc {
     if (typeof obj !== 'object') {
       throw new Error('Obj is required');
     }
+    const {
+      _params = {}
+    } = this;
+    const { schema } = obj;
+
     if (!Object.prototype.hasOwnProperty.call(obj, 'required')) {
       obj.required = true;
     }
+
     if (!Object.prototype.hasOwnProperty.call(obj, 'in')) {
       obj.in = 'body';
     }
-    if (!Object.prototype.hasOwnProperty.call(obj, 'description')) {
-      obj.description = 'Body';
+
+    if (obj.description == null) {
+      if (schema && schema.description != null) {
+        obj.description = schema.description;
+      } else {
+        obj.description = 'Body';
+      }
     }
+
     if (!Object.prototype.hasOwnProperty.call(obj, 'name')) {
       obj.name = 'Body';
     }
 
-    this._params[obj.name] = obj;
+    _params[obj.name] = obj;
 
     return this;
   }
@@ -611,15 +677,15 @@ class Doc {
 
   public build(): Path {
     const {
-      _params,
+      _params = {},
       _route,
       builder,
       doc: _doc
     } = this;
 
-    this.setParams(_.values(_params));
+    this.setParams(Object.values(_params));
 
-    const doc: Path = _.cloneDeep(_doc);
+    const doc: Path = cloneDeep(_doc);
 
     if (builder) {
       if (!_route) {
@@ -641,8 +707,6 @@ class Doc {
     const {
       code = 200
     } = options;
-
-    // const _response: Response = isIResponse(response) ? toResponse(response) : response;
 
     doc.responses[code] = response;
     return this;
@@ -671,9 +735,6 @@ class Doc {
 
   public wrapOkAndBuild(name: string, schema: Schema, code: number = 200) {
     const param = Doc.wrap(name, schema);
-    // if (isSchemaBuilder(param)) {
-    //   param = param.toSchema();
-    // }
     return this.onSuccess(code, {
       description: 'Response',
       schema: param,
@@ -707,7 +768,7 @@ class Doc {
       obj.responses = {};
     }
 
-    obj.responses[code] = _.cloneDeep(result);
+    obj.responses[code] = cloneDeep(result);
 
     if (useUtil) {
       const props: Schema = {
@@ -721,12 +782,8 @@ class Doc {
             title: 'metadata',
             type: 'object',
             properties: {
-              status: {
-                type: 'number',
-              },
-              message: {
-                type: 'string',
-              },
+              status: Doc.number(),
+              message: Doc.string(),
             },
           },
           data: props,
@@ -754,14 +811,6 @@ class Doc {
 
 export default Doc;
 
-function isSchemaBuilder(e: any): e is SchemaBuilder {
-  return e instanceof SchemaBuilder;
-}
-
-function isIResponse(e: any): e is IResponse {
-  return isSchemaBuilder(e.schema);
-}
-
 export interface IResponse {
   description: string;
   schema: SchemaBuilder;
@@ -769,13 +818,24 @@ export interface IResponse {
   examples?: { [exampleName: string]: {} };
 }
 
-const toResponse = (iRes: IResponse): Response => {
-  return {
-    description: iRes.description,
-    schema: iRes.schema.toSchema(),
-    headers: iRes.headers,
-    examples: iRes.examples
-  };
-};
-
 export type ISchema = Schema | SchemaBuilder;
+
+function isString(e: any): e is string {
+  return typeof e === 'string';
+}
+
+export interface IParamGroup {
+  [key: string]: Parameter;
+}
+
+function isBodyParam(e: any): e is BodyParameter {
+  return e.type == null;
+}
+
+function isNonBodyParam(e: any): e is
+  FormDataParameter |
+  QueryParameter |
+  PathParameter |
+  HeaderParameter {
+  return e.type != null;
+}

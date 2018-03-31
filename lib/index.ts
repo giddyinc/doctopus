@@ -3,12 +3,14 @@
 
 import Doc from './Doc';
 import DocBuilder from './DocBuilder';
+import { SchemaBuilder } from './SchemaBuilder';
 import paramGroups from './paramGroups';
 import { Parameter } from 'swagger-schema-official';
 
 export class Doctopus {
-  public Doc = Doc;
-  public DocBuilder = DocBuilder;
+  public readonly Doc = Doc;
+  public readonly DocBuilder = DocBuilder;
+  public readonly SchemaBuilder = SchemaBuilder;
   public get;
   public options;
 
@@ -49,4 +51,5 @@ export default new Doctopus();
 export {
   Doc,
   DocBuilder,
+  SchemaBuilder,
 };

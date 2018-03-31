@@ -1,7 +1,7 @@
 'use strict';
 
 import autoBind from 'auto-bind';
-import _ from 'lodash';
+import cloneDeep from 'lodash.clonedeep';
 import Doc from './Doc';
 import { Spec, Path, Schema } from 'swagger-schema-official';
 
@@ -52,7 +52,7 @@ class DocBuilder {
     Object.assign(self.definitions[path], doc);
   }
 
-  public add(path: string, doc: Path | Doc = new Doc()) {
+  public add(path: string, doc: Path | Doc = new Doc()): Doc {
     const self = this;
 
     if (isDoctopus(doc)) {
@@ -66,6 +66,8 @@ class DocBuilder {
     }
 
     Object.assign(self.docs[path], doc);
+    const docBuilder = new Doc(doc);
+    return docBuilder;
   }
 
   public build(): Spec {
@@ -87,7 +89,7 @@ class DocBuilder {
       spec.host = options.host;
     }
 
-    return _.cloneDeep(spec);
+    return cloneDeep(spec);
   }
 
   /**

@@ -7,7 +7,7 @@ import chai from 'chai';
 import doctopus from '.';
 import Doc from './Doc';
 import { Schema } from 'swagger-schema-official';
-
+import { get } from '../test/utils';
 /**
  * mocha lib/Doc.test.ts --opts .mocharc --watch
  */
@@ -370,13 +370,47 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
       expect((result.properties.cats.items as Schema).$ref).toEqual('#/definitions/Cat');
     });
 
+
+
     it('withParamGroup', () => {
-      const result = Doc.withParamGroup('foo', Doc.inlineObj({
-        type: 'string',
-      }));
+      const schema = Doc.inlineObj({
+        email: {
+          type: 'string',
+        }
+      });
+      const result = Doc.withParamGroup('foo', schema);
+      // console.log(result);
       expect(result.properties).toExist();
-      expect(result.properties.type === 'string');
+      expect(result.properties.email.type === 'string');
+
+      doctopus.paramGroup('complex', {
+        id: {
+          name: 'id',
+          description: 'resource id',
+          in: 'path',
+          required: true,
+          type: 'string',
+        },
+        data: {
+          name: 'event payload',
+          description: 'event payload for resource',
+          in: 'body',
+          required: true,
+          schema: {
+            description: 'foo',
+            properties: {
+              createdAt: Doc.date(),
+              payload: Doc.object()
+            }
+          }
+        },        
+      });
+      const complexResult = Doc.withParamGroup('complex', schema);
+      expect(complexResult.properties['event payload'].properties.createdAt.type).toExist();
     });
+
+
+
     it('arrayOfType', () => {
       const result = Doc.model('string');
       expect(result.$ref).toExist();
@@ -475,5 +509,20 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
       expect(result[key].responses).toExist();
       expect(result[key].responses['200'].schema.properties.cat.type).toExist();
     });
+  });
+
+  it('assign + set', () => {
+    doc.assign({ consumes: undefined });
+    expect(get(doc).consumes).toNotExist();
+    doc.assign({ consumes: ['foo'] });
+    expect(get(doc).consumes).toEqual(['foo']);
+    doc.assign({ consumes: undefined });
+    expect(get(doc).consumes).toNotExist();
+    doc.set('consumes', ['bar']);
+    expect(get(doc).consumes).toEqual(['bar']);
+    doc.assign({ consumes: undefined });
+    expect(get(doc).consumes).toNotExist();
+    doc.set({ consumes: ['baz'] });
+    expect(get(doc).consumes).toEqual(['baz']);
   });
 });
