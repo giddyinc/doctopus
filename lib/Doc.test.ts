@@ -169,6 +169,11 @@ describe(path.basename(__filename).replace('.test.js', ''), () => {
     expect(doc.doc.post.tags).toEqual(['foo']);
   });
 
+  it('should be able to set "consumes"', () => {
+    doc.consumes('foo');
+    expect(doc.doc.post.consumes).toEqual(['foo']);
+  });
+
   it('should be able to set group', () => {
     doc.param({
       in: 'path',
