@@ -445,6 +445,16 @@ class Doc {
   }
 
   /**
+   * Sets consumes field.
+   * @param {string} txt - Text to set Group/Namespace to.
+   * @returns {Doc} - Doc Instance.
+   */
+  public consumes(txt: string) {
+    this.innerDoc().consumes = [txt];
+    return this;
+  }
+
+  /**
    * Sets the namespace(s) for the document, for example GET /orders is in the Orders namespace.
    * @param {string[]} arr - Tags/Groups/Namespaces to associate the route to.
    * @returns {Doc} - Doc Instance.
