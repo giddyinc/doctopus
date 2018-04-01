@@ -1,8 +1,9 @@
 
 'use strict';
 
-import doctopus, { Doc, DocBuilder } from '../lib';
+import doctopus, { Doc, DocBuilder, SchemaBuilder } from '../lib';
 import expect from 'expect';
+import { get } from './utils';
 
 /**
  * mocha test/index.ts --opts .mocharc --watch
@@ -102,6 +103,87 @@ describe('doctopus', () => {
       expect(endResult.paths).toExist();
       expect(endResult.paths['/v1/cats'].get).toExist();
       expect(endResult.paths['/v1/cats'].post).toNotExist();
+    });
+
+    it('using builder api', () => {
+      const schema = Doc.inlineObj({
+        cat: Doc.model('Cat'),
+        token: Doc.string()
+      });
+
+      docs.add('/v1/cats')
+        .post()
+        .group('Cats')
+        .description('Create a cat')
+        .summary('Create')
+        .bodyParam({
+          name: 'Cat',
+          in: 'body',
+          schema: Doc.schema()
+            .properties({
+              paws: Doc.arrayOfModel('Paw'),
+              accessToken: Doc.string({
+                description: 'Access Token!'
+              })
+            })
+            .description('The cat you want to create.')
+            .requiredFields('accessToken')
+            .asSchema()
+        })
+        .response(new SchemaBuilder()
+          .description('A Cat')
+          .properties({
+            cat: Doc.model('Cat'),
+            requestId: Doc.string({
+              description: 'Request Id.'
+            })
+          })
+          .asResponse('List of cats')
+        )
+        .build();
+
+      docs.add('/v1/cats')
+        .patch()
+        .group('Cats')
+        .description('Create a cat')
+        .summary('Create')
+        .bodyParam(Doc.schema()
+          .properties({
+            paws: Doc.arrayOfModel('Paw'),
+            accessToken: Doc.string({
+              description: 'Access Token!'
+            })
+          })
+          .description('The cat you want to create.')
+          .requiredFields('accessToken')
+          .asParam('Cat')
+        )
+        .response(new SchemaBuilder()
+          .description('A Cat')
+          .properties({
+            cat: Doc.model('Cat'),
+            requestId: Doc.string({
+              description: 'Request Id.'
+            })
+          })
+          .asResponse('List of cats')
+        )
+        .build();
+
+      const endResult = docs.build();
+      expect(endResult.info).toExist();
+      expect(endResult.paths).toExist();
+      expect(endResult.paths['/v1/cats'].post).toExist();
+      expect(endResult.paths['/v1/cats'].get).toNotExist();
+
+      const { post, patch } = endResult.paths['/v1/cats'];
+      expect(post).toEqual(patch, 'post doe not match patch');
+
+      const result = post.responses['200'];
+      const schemaResult = result.schema;
+      expect(result.description).toEqual('List of cats');
+      expect(schemaResult.properties.requestId.description).toExist();
+      expect(schemaResult.properties.requestId.type).toEqual('string');
     });
   });
 

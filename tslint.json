@@ -2,6 +2,8 @@
   "defaultSeverity": "error",
   "extends": ["tslint:recommended"],
   "rules": {
+    "max-classes-per-file": false,
+    "member-ordering": false,
     "quotemark": [true, "single"],
     "radix": false,
     "ordered-imports": false,
@@ -12,6 +14,8 @@
     "no-console": false,
     "trailing-comma": false,
     "no-shadowed-variable": false,
-    "no-unused-expression": false
+    "no-unused-expression": false,
+    "no-trailing-whitespace": false,
+    "no-consecutive-blank-lines": false
   }
 }
