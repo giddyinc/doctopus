@@ -5,7 +5,7 @@ import _ from 'lodash';
 import path from 'path';
 import expect from 'expect';
 import sinon from 'sinon';
-import doctopus from '.';
+import * as doctopus from '.';
 import paramGroups from './paramGroups';
 
 /**

@@ -2,6 +2,7 @@
 import { Schema, XML, ExternalDocs, Response, BodyParameter } from 'swagger-schema-official';
 import autoBind from 'auto-bind';
 import { isString } from 'util';
+import { IProperties } from './interfaces';
 
 export class SchemaBuilder {
   constructor(private _schema: Schema = {}) {
@@ -197,12 +198,3 @@ dynamicProps.forEach((prop: string) => {
     return this;
   };
 });
-
-export interface IProperties {
-  [propertyName: string]: IExtendedSchema;
-}
-
-export interface IExtendedSchema extends Schema {
-  type?: string;
-}
-

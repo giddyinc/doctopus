@@ -6,50 +6,42 @@ import DocBuilder from './DocBuilder';
 import { SchemaBuilder } from './SchemaBuilder';
 import paramGroups from './paramGroups';
 import { Parameter } from 'swagger-schema-official';
+import { IDocStatic } from './interfaces';
 
-export class Doctopus {
-  public readonly Doc = Doc;
-  public readonly DocBuilder = DocBuilder;
-  public readonly SchemaBuilder = SchemaBuilder;
-  public get;
-  public options;
+const options = {};
 
-  constructor() {
-    this.options = {};
+export const set = (key: string, value?): void => {
+  if (!value) {
+    return options[key];
   }
 
-  public set(key: string, value) {
-    if (arguments.length === 1) {
-      return this.options[key];
-    }
+  options[key] = value;
+};
 
-    this.options[key] = value;
-    return this;
+export const get = set;
+
+export const paramGroup = (name: string, schema?: { [key: string]: Parameter }) => {
+  if (schema && typeof schema !== 'object') {
+    throw new Error('The 2nd parameter to `doctopus.paramGroup()` should be a ' +
+      'swagger schema');
   }
-
-  public paramGroup(name: string, schema?: { [key: string]: Parameter}) {
-    if (schema && typeof schema !== 'object') {
-      throw new Error('The 2nd parameter to `doctopus.paramGroup()` should be a ' +
-        'swagger schema');
+  // look up schema for the param group.
+  if (!paramGroups[name]) {
+    if (schema) {
+      paramGroups[name] = schema;
+    } else {
+      throw new Error(`Param group ${name} has not yet been registered.`);
     }
-    // look up schema for the param group.
-    if (!paramGroups[name]) {
-      if (schema) {
-        paramGroups[name] = schema;
-      } else {
-        throw new Error(`Param group ${name} has not yet been registered.`);
-      }
-    }
-    return paramGroups[name];
   }
-}
+  return paramGroups[name];
+};
 
-Doctopus.prototype.get = Doctopus.prototype.set;
 
-export default new Doctopus();
 
 export {
+  paramGroups,
   Doc,
+  IDocStatic,
   DocBuilder,
   SchemaBuilder,
 };

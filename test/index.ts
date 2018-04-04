@@ -1,7 +1,7 @@
 
 'use strict';
 
-import doctopus, { Doc, DocBuilder, SchemaBuilder } from '../lib';
+import { Doc, DocBuilder, SchemaBuilder, paramGroup } from '../lib';
 import expect from 'expect';
 import { get } from './utils';
 
@@ -198,8 +198,8 @@ describe('doctopus', () => {
           type: 'string'
         }
       };
-      doctopus.paramGroup('foo', schema);
-      expect(doctopus.paramGroup('foo')).toEqual(schema);
+      paramGroup('foo', schema);
+      expect(paramGroup('foo')).toEqual(schema);
     });
   });
 });

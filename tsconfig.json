@@ -4,7 +4,6 @@
     "declaration": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "allowJs": false,
     "module": "commonjs",
     "moduleResolution": "node",
     "lib": [

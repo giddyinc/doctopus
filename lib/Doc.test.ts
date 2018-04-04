@@ -4,7 +4,7 @@ import path from 'path';
 import expect from 'expect';
 import sinon from 'sinon';
 import chai from 'chai';
-import doctopus from '.';
+import * as doctopus from '.';
 import Doc from './Doc';
 import { Schema } from 'swagger-schema-official';
 import { get } from '../test/utils';

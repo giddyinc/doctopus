@@ -20,11 +20,10 @@ import {
 } from 'swagger-schema-official';
 
 import DocBuilder from './DocBuilder';
-import { SchemaBuilder, IProperties } from './SchemaBuilder';
+import { SchemaBuilder } from './SchemaBuilder';
+import { IDefitinitions, IParamGroup, IProperties } from './interfaces';
 
-export interface IDefitinitions {
-  [definitionsName: string]: Schema;
-}
+
 
 let definitions: IDefitinitions = {};
 
@@ -146,7 +145,7 @@ class Doc {
    * Helper to create a file typed swagger definition object.
    * @returns {object} - Reference to a swagger definition object for a file.
    */
-  public static file = (opts: Schema = {}) => {
+  public static file = (opts: Schema = {}): Schema => {
     return {
       ...opts,
       type: 'file',
@@ -429,36 +428,42 @@ class Doc {
    * Helper for JSON Payload response
    * @param {any} obj - Body sent in JSON Response
    */
-  public bodyParam(obj: BodyParameter) {
+  public bodyParam(obj: {
+    description?: string;
+    in?: string;
+    required?: boolean;
+    schema?: Schema;
+    name?: string;
+  }): this {
     if (typeof obj !== 'object') {
       throw new Error('Obj is required');
     }
     const {
       _params = {}
     } = this;
-    const { schema } = obj;
 
-    if (!Object.prototype.hasOwnProperty.call(obj, 'required')) {
-      obj.required = true;
-    }
+    const defaults = {
+      in: 'body',
+      name: 'Body',
+      required: true
+    };
 
-    if (!Object.prototype.hasOwnProperty.call(obj, 'in')) {
-      obj.in = 'body';
-    }
+    const param = {
+      ...defaults,
+      ...obj,
+    };
+
+    const { name, schema } = param;
 
     if (obj.description == null) {
       if (schema && schema.description != null) {
-        obj.description = schema.description;
+        param.description = schema.description;
       } else {
-        obj.description = 'Body';
+        param.description = 'Body';
       }
     }
 
-    if (!Object.prototype.hasOwnProperty.call(obj, 'name')) {
-      obj.name = 'Body';
-    }
-
-    _params[obj.name] = obj;
+    _params[name] = param;
 
     return this;
   }
@@ -811,21 +816,8 @@ class Doc {
 
 export default Doc;
 
-export interface IResponse {
-  description: string;
-  schema: SchemaBuilder;
-  headers?: { [headerName: string]: Header };
-  examples?: { [exampleName: string]: {} };
-}
-
-export type ISchema = Schema | SchemaBuilder;
-
 function isString(e: any): e is string {
   return typeof e === 'string';
-}
-
-export interface IParamGroup {
-  [key: string]: Parameter;
 }
 
 function isBodyParam(e: any): e is BodyParameter {
