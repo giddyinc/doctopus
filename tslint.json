@@ -16,6 +16,8 @@
     "no-shadowed-variable": false,
     "no-unused-expression": false,
     "no-trailing-whitespace": false,
-    "no-consecutive-blank-lines": false
+    "no-consecutive-blank-lines": false,
+    "max-line-length": false,
+    "only-arrow-functions": false
   }
 }

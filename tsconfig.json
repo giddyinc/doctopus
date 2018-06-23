@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "experimentalDecorators": false,
     "noUnusedLocals": false,
     "declaration": true,
     "allowSyntheticDefaultImports": true,
@@ -11,6 +12,7 @@
     ],
     "target": "es5",
     "strict": true,
+    "alwaysStrict": true,
     "outDir": "./dist",
     "preserveConstEnums": true,
     "removeComments": true,
