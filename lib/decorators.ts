@@ -4,9 +4,20 @@ import { Response, Parameter } from 'swagger-schema-official';
 const namespaceKey = '__docs';
 // const namespaceKey = Symbol('__doctopus');
 
+const clearDocs = (target: any) => {
+    return () => {
+        delete target.__docs;
+    };
+};
+
 const initDocs = (target: any) => {
     if (target[namespaceKey] == null) {
         target[namespaceKey] = {};
+        Reflect.defineProperty(target[namespaceKey], 'clear', {
+            value: clearDocs(target),
+            enumerable: false,
+            writable: false
+        });
     }
 };
 

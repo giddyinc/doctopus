@@ -55,6 +55,58 @@ app.listen('3000');
 
 ```
 
+#### Decorator API
+```ts
+
+import { 
+    get, 
+    route, 
+    group, 
+    param, 
+    response, 
+    Doc, 
+    DocBuilder,
+} from 'doctopus';
+
+// set default for all controller methods
+@group('Cats')
+class CatCtrl {
+
+    // http get request
+    @get
+    // set route
+    @route('/cats/{id}')
+    // override group of a specific method
+    @group('Orders')
+    public findOne(req, res) {
+        res.send({});
+    }
+
+    @get
+    @route('/cats')
+    // add a param
+    @param({
+        in: 'query',
+        type: 'string',
+        name: 'name',  
+    })
+    // declare response
+    @response({
+        description: 'All Cats',
+        schema: Doc.object(), // schema, see schema api
+    })
+    public findAll(req, res) {
+        res.send([]);
+    }
+}
+
+const docs = new DocBuilder();
+
+// docBuilder instance will read the docs
+docs.use(CatCtrl);
+
+```
+
 ## Advanced Usage
 
 Doctopus was designed with automation and re-usability in mind. To leverage automatic doc generation, we recommend using two packages that we've found to be helpful. 

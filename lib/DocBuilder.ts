@@ -124,6 +124,7 @@ class DocBuilder {
    */
   public use(object: any, options: {
     include?: string[],
+    clearOnRegister?: boolean,
   } = {}): void {
     if (!object || !object.prototype) {
       throw new TypeError('DocBuilder.use must be called with a constructor.');
@@ -135,7 +136,8 @@ class DocBuilder {
     }
 
     const {
-      include
+      include,
+      clearOnRegister = true,
     } = options;
 
     let entries: Array<[string, IDecoratorDoc]> = Object.entries(__docs);
@@ -153,20 +155,25 @@ class DocBuilder {
     
     const values: IDecoratorDoc[] = entries.map((e) => e[1]);
 
-    for (const dec of values) {
-      const doc = this.add(dec.path)
-        .setMethod(dec.method)
-        .group(dec.group)
+    for (const decoratorDoc of values) {
+      const doc = this.add(decoratorDoc.path)
+        .setMethod(decoratorDoc.method)
+        .group(decoratorDoc.group)
         ;
 
-      Object.entries(dec.responses).forEach((r: any) => {
+      Object.entries(decoratorDoc.responses).forEach((r: any) => {
         const [ code, response] = r;
         doc.response(response, { code });
       });
 
-      dec.params.forEach((p) => doc.param(p));
+      decoratorDoc.params.forEach((p) => doc.param(p));
 
       doc.build();
+
+      if (clearOnRegister) {
+        __docs.clear();
+      }
+
     }
 
   }
