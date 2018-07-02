@@ -1,9 +1,9 @@
-'use strict';
 
 import autoBind from 'auto-bind';
 import cloneDeep from 'lodash.clonedeep';
+import { Path, Schema, Spec } from 'swagger-schema-official';
+import { IDecoratorDoc } from './decorators';
 import Doc from './Doc';
-import { Spec, Path, Schema } from 'swagger-schema-official';
 
 /**
  * @class
@@ -114,6 +114,70 @@ class DocBuilder {
     }
     return factory;
   }
+
+  /**
+   * TODO: come up with a better name
+   * Extract from a class, documentation
+   * generated from the decorator API and register
+   * it into the docs.
+   * @param object 
+   */
+  public use(object: any, options: {
+    include?: string[],
+    clearOnRegister?: boolean,
+  } = {}): void {
+    if (!object || !object.prototype) {
+      throw new TypeError('DocBuilder.use must be called with a constructor.');
+    }
+    const { __docs } = object.prototype;
+    if (!__docs) {
+      console.log('No docs registered.');
+      return;
+    }
+
+    const {
+      include,
+      clearOnRegister = true,
+    } = options;
+
+    let entries: Array<[string, IDecoratorDoc]> = Object.entries(__docs);
+
+    if (include != null) {
+      if (!Array.isArray(include)) {
+        throw new TypeError('Include must be an array.');
+      }
+      const map = include.reduce((all, k: string) => { all[k] = true; return all; }, {});
+      entries = entries.filter((e) => {
+        const [ key ] = e;
+        return map[key] === true;
+      });
+    }
+    
+    const values: IDecoratorDoc[] = entries.map((e) => e[1]);
+
+    for (const decoratorDoc of values) {
+      const doc = this.add(decoratorDoc.path)
+        .setMethod(decoratorDoc.method)
+        .group(decoratorDoc.group)
+        ;
+
+      Object.entries(decoratorDoc.responses).forEach((r: any) => {
+        const [ code, response] = r;
+        doc.response(response, { code });
+      });
+
+      decoratorDoc.params.forEach((p) => doc.param(p));
+
+      doc.build();
+
+      if (clearOnRegister) {
+        __docs.clear();
+      }
+
+    }
+
+  }
+
 }
 
 export default DocBuilder;
