@@ -36,6 +36,7 @@ const setTemp = (target: any, method: string | symbol, key: string, value: any) 
     ref[key] = value;
 };
 
+
 const getMethodDecorator = (method: string): MethodDecorator => (target, propertyKey, descriptor) => {
     initDocs(target);
     setTemp(target, propertyKey, 'method', method);
@@ -53,6 +54,16 @@ export const route = (path: string): MethodDecorator => (target: any, propertyKe
     setTemp(target, propertyKey, 'path', path);
     return descriptor;
 };
+
+const createDecorator = (key: string) => (path: string): MethodDecorator => (target: any, propertyKey, descriptor: TypedPropertyDescriptor<any>): any => {
+    initDocs(target);
+    setTemp(target, propertyKey, key, path);
+    return descriptor;
+};
+
+export const description = createDecorator('description');
+export const summary = createDecorator('summary');
+export const operationId = createDecorator('operationId');
 
 export const isClassDecorator = (args: any): args is ClassDecorator => {
     return args.length === 1;
