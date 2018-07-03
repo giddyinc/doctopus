@@ -166,6 +166,18 @@ class DocBuilder {
         doc.response(response, { code });
       });
 
+      if (decoratorDoc.description != null) {
+        doc.description(decoratorDoc.description);
+      }
+
+      if (decoratorDoc.operationId != null) {
+        doc.operationId(decoratorDoc.operationId);
+      }
+
+      if (decoratorDoc.summary != null) {
+        doc.summary(decoratorDoc.summary);
+      }
+
       decoratorDoc.params.forEach((p) => doc.param(p));
 
       doc.build();

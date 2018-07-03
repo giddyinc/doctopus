@@ -99,11 +99,14 @@ export const param = (input: Parameter): MethodDecorator => (target, propertyKey
 };
 
 export interface IDecoratorDoc {
-    method: string;
-    path: string;
+    description?: string;
     group: string;
-    responses: { [key: string]: Response };
+    method: string;
+    operationId?: string;
     params: Parameter[];
+    path: string;
+    responses: { [key: string]: Response };
+    summary?: string;
 }
 
 export interface IResponseInput extends Response {
