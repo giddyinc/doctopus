@@ -57,7 +57,7 @@ gulp.task('coveralls', ['test'], () => {
     .pipe(coveralls());
 });
 
-gulp.task('babel', ['clean'], () => gulp.src([
+gulp.task('compile', ['clean'], () => gulp.src([
   'lib/**/*.{js,ts}',
   '!lib/**/*.test.{js,ts}'
 ])
@@ -66,5 +66,5 @@ gulp.task('babel', ['clean'], () => gulp.src([
 
 gulp.task('clean', () => del('dist'));
 
-gulp.task('prepublish', ['nsp', 'babel']);
+gulp.task('prepublish', ['nsp', 'compile']);
 gulp.task('default', ['static', 'test', 'coveralls']);
