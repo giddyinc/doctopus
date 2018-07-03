@@ -131,7 +131,7 @@ class DocBuilder {
     }
     const { __docs } = object.prototype;
     if (!__docs) {
-      console.log('No docs registered.');
+      // console.log('No docs registered.');
       return;
     }
 

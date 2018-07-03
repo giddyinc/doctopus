@@ -46,7 +46,7 @@ export class SchemaBuilder {
       param.description = description;
     }
 
-    console.log(param);
+    // console.log(param);
     return param;
   }
 

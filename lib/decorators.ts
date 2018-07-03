@@ -36,31 +36,20 @@ const setTemp = (target: any, method: string | symbol, key: string, value: any) 
     ref[key] = value;
 };
 
-
-const getMethodDecorator = (method: string): MethodDecorator => (target, propertyKey, descriptor) => {
+const createDecorator = (key: string) => (path: string): MethodDecorator => (target, propertyKey, descriptor) => {
     initDocs(target);
-    setTemp(target, propertyKey, 'method', method);
+    setTemp(target, propertyKey, key, path);
     return descriptor;
 };
+
+const getMethodDecorator = createDecorator('method');
 
 export const get = getMethodDecorator('get');
 export const post = getMethodDecorator('post');
 export const patch = getMethodDecorator('patch');
 export const del = getMethodDecorator('delete');
 export const put = getMethodDecorator('put');
-
-export const route = (path: string): MethodDecorator => (target: any, propertyKey, descriptor: TypedPropertyDescriptor<any>): any => {
-    initDocs(target);
-    setTemp(target, propertyKey, 'path', path);
-    return descriptor;
-};
-
-const createDecorator = (key: string) => (path: string): MethodDecorator => (target: any, propertyKey, descriptor: TypedPropertyDescriptor<any>): any => {
-    initDocs(target);
-    setTemp(target, propertyKey, key, path);
-    return descriptor;
-};
-
+export const route = createDecorator('path');
 export const description = createDecorator('description');
 export const summary = createDecorator('summary');
 export const operationId = createDecorator('operationId');
@@ -85,7 +74,6 @@ export const group = (name: string) => {
         return descriptor;
     };
 };
-
 
 export const response = (input: IResponseInput): MethodDecorator => (target, propertyKey, descriptor) => {
     initDocs(target);
