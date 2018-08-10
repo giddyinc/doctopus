@@ -1,9 +1,10 @@
 
 import autoBind from 'auto-bind';
 import cloneDeep from 'lodash.clonedeep';
-import { Path, Schema, Spec } from 'swagger-schema-official';
+import { Path, Schema, Spec, Security } from 'swagger-schema-official';
 import { IDecoratorDoc } from './decorators';
 import Doc from './Doc';
+import { Dictionary } from '../node_modules/@types/lodash';
 
 /**
  * @class
@@ -16,6 +17,7 @@ class DocBuilder {
   };
   private definitions: { [definitionName: string]: Schema };
   private options: any;
+  private securityDefinitions: Dictionary<Security> = {};
 
   constructor(docs?) {
     this.docs = docs || {};
@@ -71,7 +73,12 @@ class DocBuilder {
   }
 
   public build(): Spec {
-    const { definitions, docs, options } = this;
+    const { 
+      definitions, 
+      docs, 
+      options, 
+      securityDefinitions = {}, 
+    } = this;
     const spec: Spec = {
       definitions,
       host: '',
@@ -80,7 +87,7 @@ class DocBuilder {
         version: options.version || '1.0.0', // Version (required)
       },
       paths: docs,
-      securityDefinitions: {},
+      securityDefinitions,
       swagger: '2.0',
       tags: [],
     };
@@ -90,6 +97,13 @@ class DocBuilder {
     }
 
     return cloneDeep(spec);
+  }
+
+  public setSecurityDefinition(name: string, definition: Security) {
+    if (name != null && name !== '' && typeof name === 'string' && definition != null && typeof definition === 'object') {
+      this.securityDefinitions[name] = definition;
+    }
+    return this;
   }
 
   /**
