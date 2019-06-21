@@ -1,10 +1,12 @@
+// @ts-check
+
 'use strict';
 
 const path = require('path');
 const gulp = require('gulp');
 const excludeGitignore = require('gulp-exclude-gitignore');
 const mocha = require('gulp-mocha');
-const nsp = require('gulp-nsp');
+
 const plumber = require('gulp-plumber');
 const coveralls = require('gulp-coveralls');
 const del = require('del');
@@ -15,12 +17,6 @@ gulp.task('static', () => gulp.src(['src/**/*.{js,ts}'])
   .pipe(excludeGitignore())
   .pipe(tsProject())
 );
-
-gulp.task('nsp', cb => {
-  nsp({
-    package: path.resolve('package.json')
-  }, cb);
-});
 
 gulp.task('test', [], cb => {
   let mochaErr;
@@ -66,5 +62,5 @@ gulp.task('compile', ['clean'], () => gulp.src([
 
 gulp.task('clean', () => del('dist'));
 
-gulp.task('prepublish', ['nsp', 'compile']);
+gulp.task('prepublish', ['compile']);
 gulp.task('default', ['static', 'test', 'coveralls']);
