@@ -35,7 +35,7 @@
     "clarify": "^2.0.0",
     "coveralls": "3.0.4",
     "del": "^2.0.2",
-    "eslint": "4.18.2",
+    "eslint": "5.16.0",
     "eslint-config-xo-space": "^0.15.0",
     "expect": "^1.20.2",
     "gulp": "^3.9.0",
