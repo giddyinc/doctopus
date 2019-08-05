@@ -6,4 +6,5 @@ cache:
   - node_modules
 git:
   depth: 1
-after_success: npm run coverage
+after_success: 
+- bash <(curl -s https://codecov.io/bash)

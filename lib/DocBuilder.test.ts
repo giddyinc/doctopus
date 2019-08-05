@@ -9,7 +9,7 @@ import DocBuilder from './DocBuilder';
 import { Path } from 'swagger-schema-official';
 
 /**
- * mocha lib/DocBuilder.test.ts --opts .mocharc --watch
+ * mocha lib/DocBuilder.test.ts --watch
  */
 
 describe(path.basename(__filename).replace('.test.js', ''), () => {

@@ -2,7 +2,7 @@
 import { get, put, route, group, patch, summary, description, operationId } from './decorators';
 import { expect } from 'chai';
 
-// mocha lib/decorators.test.ts --opts .mocharc --watch
+// mocha lib/decorators.test.ts --watch
 describe('decorators', () => {
     it('get', () => {
         class C {

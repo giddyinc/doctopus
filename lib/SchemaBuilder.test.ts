@@ -5,7 +5,7 @@ import { expect } from 'chai';
 
 const parsed = (obj) => JSON.parse(JSON.stringify(obj.build()));
 
-// mocha lib/SchemaBuilder.test.ts --opts .mocharc --watch
+// mocha lib/SchemaBuilder.test.ts --watch
 
 describe('SchemaBuilder', () => {
   it('should work', () => {

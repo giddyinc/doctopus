@@ -9,7 +9,7 @@ import Doc from './Doc';
 import { Schema } from 'swagger-schema-official';
 import { get } from '../test/utils';
 /**
- * mocha lib/Doc.test.ts --opts .mocharc --watch
+ * mocha lib/Doc.test.ts --watch
  */
 
 describe(path.basename(__filename).replace('.test.js', ''), () => {

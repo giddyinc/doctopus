@@ -6,7 +6,7 @@ import expect from 'expect';
 import { get } from './utils';
 
 /**
- * mocha test/index.ts --opts .mocharc --watch
+ * mocha test/index.ts --watch
  */
 
 describe('doctopus', () => {

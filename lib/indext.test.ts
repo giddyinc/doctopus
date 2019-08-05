@@ -9,7 +9,7 @@ import * as doctopus from '.';
 import paramGroups from './paramGroups';
 
 /**
- * mocha ./lib/indext.test.ts --opts .mocharc --watch
+ * mocha ./lib/indext.test.ts --watch
  */
 
 describe(path.basename(__filename).replace('.test.js', ''), () => {
