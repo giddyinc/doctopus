@@ -2,6 +2,7 @@
 [![NPM version][npm-image]][npm-url]
 [![Build Status][travis-image]][travis-url]
 [![Dependency Status][daviddm-image]][daviddm-url]
+[![codecov](https://codecov.io/gh/giddyinc/doctopus/branch/master/graph/badge.svg)](https://codecov.io/gh/giddyinc/doctopus)
 
 # doctopus
 
