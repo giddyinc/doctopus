@@ -61,7 +61,7 @@
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "dependencies": {
-    "@types/swagger-schema-official": "^2.0.9",
+    "@types/swagger-schema-official": "2.0.9",
     "auto-bind": "^1.2.0",
     "lodash.clonedeep": "^4.5.0"
   },
