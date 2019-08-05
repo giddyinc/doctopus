@@ -2,13 +2,11 @@
 
 'use strict';
 
-const path = require('path');
 const gulp = require('gulp');
 const excludeGitignore = require('gulp-exclude-gitignore');
 const mocha = require('gulp-mocha');
 
 const plumber = require('gulp-plumber');
-const coveralls = require('gulp-coveralls');
 const del = require('del');
 const ts = require('gulp-typescript');
 const tsProject = ts.createProject('tsconfig.json');
@@ -18,9 +16,9 @@ gulp.task('static', () => gulp.src(['src/**/*.{js,ts}'])
   .pipe(tsProject())
 );
 
-gulp.task('test', [], cb => {
+gulp.task('test', cb => {
   let mochaErr;
-  gulp.src([
+  return gulp.src([
     'lib/**/*.test.{js,ts}',
     'test/**/*.{js,ts}'
   ])
@@ -40,27 +38,21 @@ gulp.task('test', [], cb => {
     });
 });
 
-gulp.task('watch', ['test'], () => {
-  gulp.watch(['lib/**/*.js', 'test/**'], ['test']);
-});
-
-gulp.task('coveralls', ['test'], () => {
-  if (!process.env.CI) {
-    return;
-  }
-
-  return gulp.src(path.join(__dirname, 'coverage/lcov.info'))
-    .pipe(coveralls());
-});
-
-gulp.task('compile', ['clean'], () => gulp.src([
-  'lib/**/*.{js,ts}',
-  '!lib/**/*.test.{js,ts}'
-])
-  .pipe(tsProject())
-  .pipe(gulp.dest('dist')));
+gulp.task('watch', gulp.series(['test', () => {
+  gulp.watch(['lib/**/*.js', 'test/**'], gulp.series(['test']));
+}]));
 
 gulp.task('clean', () => del('dist'));
 
-gulp.task('prepublish', ['compile']);
-gulp.task('default', ['static', 'test', 'coveralls']);
+gulp.task('compile', gulp.series([
+  'clean',
+  () => gulp.src([
+    'lib/**/*.{js,ts}',
+    '!lib/**/*.test.{js,ts}'
+  ])
+    .pipe(tsProject())
+    .pipe(gulp.dest('dist'))
+]));
+
+gulp.task('prepublish', gulp.series(['compile']));
+gulp.task('default', gulp.series(['static', 'test']));
