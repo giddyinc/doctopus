@@ -1,6 +1,6 @@
 {
   "name": "doctopus",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Fluent & Pluggable Swagger Specification Builder",
   "homepage": "",
   "author": {
@@ -55,7 +55,8 @@
     "prepublish": "gulp prepublish",
     "test": "nyc --reporter=text --reporter=html --reporter=lcov gulp",
     "test:watch": "gulp watch",
-    "coverage": "nyc report --reporter=text-lcov | coveralls"
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "build": "tsc"
   },
   "dependencies": {
     "@types/swagger-schema-official": "2.0.9",
