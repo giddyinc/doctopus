@@ -1,5 +1,5 @@
 
-import { group, get, route, param, response, Doc } from 'doctopus';
+import { group, get, route, param, response, Doc, deprecated } from '../../../lib';
 
 @group('Cats')
 export class CatCtrl {
@@ -17,6 +17,7 @@ export class CatCtrl {
 
     @get
     @route('/cats')
+    @deprecated
     @response({
         description: 'All Cats',
         schema: Doc.arrayOf(Doc.inlineObj({

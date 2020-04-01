@@ -192,6 +192,10 @@ class DocBuilder {
         doc.summary(decoratorDoc.summary);
       }
 
+      if(decoratorDoc.deprecated) {
+        doc.set('deprecated', true);
+      }
+
       decoratorDoc.params.forEach((p) => doc.param(p));
 
       doc.build();

@@ -39,7 +39,7 @@
     "gulp": "4.0.2",
     "gulp-eslint": "^3.0.1",
     "gulp-exclude-gitignore": "^1.0.0",
-    "gulp-line-ending-corrector": "^1.0.1",
+    "gulp-line-ending-corrector": "1.0.3",
     "gulp-mocha": "6.0.0",
     "gulp-plumber": "^1.0.0",
     "gulp-typescript": "4.0.1",

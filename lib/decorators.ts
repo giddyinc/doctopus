@@ -54,6 +54,8 @@ export const description = createDecorator('description');
 export const summary = createDecorator('summary');
 export const operationId = createDecorator('operationId');
 
+// any decorator values need to be represented in DocBuilder https://github.com/giddyinc/doctopus/blob/master/lib/DocBuilder.ts#L184
+
 export const isClassDecorator = (args: any): args is ClassDecorator => {
     return args.length === 1;
 };
@@ -98,7 +100,16 @@ export const param = (input: Parameter): MethodDecorator => (target, propertyKey
     return descriptor;
 };
 
+export const deprecated: MethodDecorator = (target, propertyKey, descriptor) => {
+    initDocs(target);
+    initKey(target, propertyKey);
+    const doc: IDecoratorDoc = target[namespaceKey][propertyKey];
+    doc.deprecated = true;
+    return descriptor;
+};
+
 export interface IDecoratorDoc {
+    deprecated?: boolean;
     description?: string;
     group: string;
     method: string;
