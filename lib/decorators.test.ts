@@ -1,8 +1,9 @@
 
-import { get, put, route, group, patch, summary, description, operationId } from './decorators';
+import { get, put, route, group, patch, summary, description, operationId, deprecated } from './decorators';
 import { expect } from 'chai';
 
-// mocha lib/decorators.test.ts --watch
+// npx mocha lib/decorators.test.ts --watch
+
 describe('decorators', () => {
     it('get', () => {
         class C {
@@ -39,16 +40,21 @@ describe('decorators', () => {
         expect(C.prototype.__docs.speak.group).to.equal('bears');
         expect(C.prototype.__docs.bark.group).to.equal('animals');
     });
+
     it('summary/op', () => {
         @group('animals')
         class C {
             @summary('foo')
             @description('bar')
             @operationId('123')
+            @deprecated
             public speak() {}
         }
         expect(C.prototype.__docs.speak.summary).to.equal('foo');
         expect(C.prototype.__docs.speak.description).to.equal('bar');
         expect(C.prototype.__docs.speak.operationId).to.equal('123');
+
+        console.log(C.prototype.__docs.speak);
     });
+
 });

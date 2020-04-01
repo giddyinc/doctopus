@@ -1,6 +1,6 @@
 
 import express from 'express';
-import { Doc, DocBuilder } from 'doctopus';
+import { Doc, DocBuilder } from '../../../lib';
 import path from 'path';
 import { CatCtrl } from './CatCtrl';
 
