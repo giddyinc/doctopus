@@ -8,8 +8,6 @@
 
 Nobody likes writing docs. So to make it better, we wrote doctopus; a fluent pluggable Swagger spec builder enabling docs to be built quickly and maintained automatically.
 
-[Docs][docs-url]
-
 ![alt tag](octopus1.jpg)
 
 The doctopus API provides heavy syntactic sugar over Swagger enabling re-use of common libraries and components for documentation composition.
@@ -193,7 +191,6 @@ Doc.paramGroup('public');
 ```
 
 ## Resources
-- [API Docs][docs-url]
 - [Helpful Tutorial](http://mherman.org/blog/2016/05/26/swagger-and-nodejs)
 - [swagger-jsdoc](https://github.com/Surnet/swagger-jsdoc) - annotation helper
 - [Official Swagger Documentation](http://swagger.io/docs/)
@@ -207,7 +204,6 @@ We look forward to seeing your contributions!
 
 MIT © [Ben Lugavere](http://benlugavere.com/)
 
-[docs-url]: https://doclets.io/giddyinc/doctopus/master#dl-Doc
 [npm-image]: https://badge.fury.io/js/doctopus.svg
 [npm-url]: https://npmjs.org/package/doctopus
 [travis-image]: https://travis-ci.org/giddyinc/doctopus.svg?branch=master
