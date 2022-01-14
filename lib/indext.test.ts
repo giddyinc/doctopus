@@ -13,33 +13,35 @@ import paramGroups from './paramGroups';
  */
 
 describe(path.basename(__filename).replace('.test.js', ''), () => {
-  let sandbox;
-  beforeEach(() => {
-    sandbox = sinon.sandbox.create();
-  });
-
-  afterEach(() => {
-    sandbox.restore();
-    doctopus.options = {};
-    Object.keys(paramGroups).forEach((x) => {
-      delete paramGroups[x];
+    let sandbox;
+    beforeEach(() => {
+        sandbox = sinon.sandbox.create();
     });
-  });
 
-  it('should be able to set options', () => {
-    doctopus.set('foo', 'bar');
-    expect(doctopus.get('foo')).toBe('bar');
-  });
+    afterEach(() => {
+        sandbox.restore();
+        // @ts-ignore
+        doctopus.options = {};
+        Object.keys(paramGroups).forEach((x) => {
+            delete paramGroups[x];
+        });
+    });
 
-  it('should be able to set paramGroup', () => {
-    doctopus.paramGroup('foo', {});
-    expect(doctopus.paramGroup('foo')).toEqual({});
-  });
+    it('should be able to set options', () => {
+        doctopus.set('foo', 'bar');
+        expect(doctopus.get('foo')).toBe('bar');
+    });
 
-  it('should throw on bad params', () => {
-    expect(() => doctopus.paramGroup('foo')).toThrow(Error);
-  });
-  it('should throw on bad params', () => {
-    expect(() => doctopus.paramGroup('foo', 'wtf')).toThrow(Error);
-  });
+    it('should be able to set paramGroup', () => {
+        doctopus.paramGroup('foo', {});
+        expect(doctopus.paramGroup('foo')).toEqual({});
+    });
+
+    it('should throw on bad params', () => {
+        expect(() => doctopus.paramGroup('foo')).toThrow(Error);
+    });
+    it('should throw on bad params 2', () => {
+        // @ts-ignore
+        expect(() => doctopus.paramGroup('foo', 'wtf')).toThrow(Error);
+    });
 });

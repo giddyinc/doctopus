@@ -3,7 +3,6 @@
 
 import { Doc, DocBuilder, SchemaBuilder, paramGroup } from '../lib';
 import expect from 'expect';
-import { get } from './utils';
 
 /**
  * mocha test/index.ts --watch
@@ -179,11 +178,11 @@ describe('doctopus', () => {
       const { post, patch } = endResult.paths['/v1/cats'];
       expect(post).toEqual(patch, 'post doe not match patch');
 
-      const result = post.responses['200'];
-      const schemaResult = result.schema;
-      expect(result.description).toEqual('List of cats');
-      expect(schemaResult.properties.requestId.description).toExist();
-      expect(schemaResult.properties.requestId.type).toEqual('string');
+      const result = post?.responses['200'];
+      const schemaResult = result?.schema;
+      expect(result?.description).toEqual('List of cats');
+      expect(schemaResult?.properties?.requestId.description).toExist();
+      expect(schemaResult?.properties?.requestId.type).toEqual('string');
     });
   });
 

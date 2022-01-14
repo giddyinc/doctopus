@@ -1,33 +1,11 @@
 {
-  "compilerOptions": {
-    "experimentalDecorators": false,
-    "noUnusedLocals": false,
-    "declaration": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "lib": [
-      "es2017"
-    ],
-    "target": "es5",
-    "strict": true,
-    "alwaysStrict": true,
-    "outDir": "./dist",
-    "preserveConstEnums": true,
-    "removeComments": true,
-    "inlineSourceMap": false,
-    "noImplicitAny": false,
-    "typeRoots": [
-      "./node_modules/@types"
-    ]
-  },
-  "include": [
-    "lib/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "**/*.test.ts",
-    "gulpfile"
-  ]
+    "extends": "./tsconfig.base.json",
+    "compilerOptions": {
+        "rootDir": "lib",
+        "baseUrl": ".",
+        "typeRoots": ["./node_modules/@types", "./typings"],
+        "moduleResolution": "node"
+    },
+    "include": ["lib/**/*", "lib/**/*.json", "./typings/**/*"],
+    "exclude": ["node_modules", "build", "scripts"]
 }

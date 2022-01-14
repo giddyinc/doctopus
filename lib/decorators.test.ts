@@ -10,26 +10,25 @@ describe('decorators', () => {
             @get
             public speak() {}
         }
-        expect(C.prototype.__docs.speak.method).to.equal('get');
+        expect((C.prototype as any).__docs.speak.method).to.equal('get');
     });
     it('put', () => {
         class C {
             @put
             public speak() {}
         }
-        expect(C.prototype.__docs.speak.method).to.equal('put');
+        expect((C.prototype as any).__docs.speak.method).to.equal('put');
     });
     it('route', () => {
         class C {
             @route('/foo/{id}')
             public speak() {}
         }
-        expect(C.prototype.__docs.speak.path).to.equal('/foo/{id}');
+        expect((C.prototype as any).__docs.speak.path).to.equal('/foo/{id}');
     });
     it('group', () => {
         @group('animals')
         class C {
-
             @put
             public bark() {}
 
@@ -37,8 +36,8 @@ describe('decorators', () => {
             @group('bears')
             public speak() {}
         }
-        expect(C.prototype.__docs.speak.group).to.equal('bears');
-        expect(C.prototype.__docs.bark.group).to.equal('animals');
+        expect((C.prototype as any).__docs.speak.group).to.equal('bears');
+        expect((C.prototype as any).__docs.bark.group).to.equal('animals');
     });
 
     it('summary/op', () => {
@@ -50,11 +49,10 @@ describe('decorators', () => {
             @deprecated
             public speak() {}
         }
-        expect(C.prototype.__docs.speak.summary).to.equal('foo');
-        expect(C.prototype.__docs.speak.description).to.equal('bar');
-        expect(C.prototype.__docs.speak.operationId).to.equal('123');
+        expect((C.prototype as any).__docs.speak.summary).to.equal('foo');
+        expect((C.prototype as any).__docs.speak.description).to.equal('bar');
+        expect((C.prototype as any).__docs.speak.operationId).to.equal('123');
 
-        console.log(C.prototype.__docs.speak);
+        console.log((C.prototype as any).__docs.speak);
     });
-
 });

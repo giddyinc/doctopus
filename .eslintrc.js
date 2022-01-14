@@ -1,25 +1,37 @@
+'use strict';
+
 module.exports = {
-  "extends": "xo-space",
-  "env": {
-    "mocha": true,
-    "node": true
-  },
-  "parserOptions": {
-    "ecmaVersion": 8,
-    "ecmaFeatures": {
-      "experimentalObjectRestSpread": true,
+    parser: '@typescript-eslint/parser',
+    settings: {
+        cache: true,
+        cacheLocation: '.vscode/.eslintcache',
+        'import/extensions': ['.js'],
+        'import/resolver': {
+            typescript: {},
+            node: {
+                extensions: ['.js', '.json', '.ts'],
+            },
+        },
     },
-    "sourceType": "module"
-  },
-  "rules": {
-    'prefer-arrow-callback': 1,
-    'no-extra-parens': 1,
-    'arrow-parens': [1, "as-needed"],
-    'arrow-body-style': ["error", "as-needed"],
-    "guard-for-in": [0],
-    "max-nested-callbacks": 0,
-    "no-multiple-empty-lines": 1,
-    "no-var": 1,
-    "prefer-const": 1
-  }
-}
+    parserOptions: {
+        ecmaVersion: 9,
+        sourceType: 'module',
+        experimentalObjectRestSpread: true,
+        project: ['./tsconfig.json'],
+        tsconfigRootDir: __dirname,
+    },
+    extends: ['@boxed/eslint-config-style-guide/nodejs'],
+    globals: {
+        NodeJS: true,
+        Highland: true,
+    },
+    plugins: [
+        '@typescript-eslint',
+        'typescript',
+        'chai-friendly',
+        'promise',
+        'mocha',
+    ],
+    overrides: [],
+    rules: {},
+};
