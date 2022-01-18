@@ -4,7 +4,6 @@
 import _ from 'lodash';
 import path from 'path';
 import expect from 'expect';
-import sinon from 'sinon';
 import * as doctopus from '.';
 import paramGroups from './paramGroups';
 
@@ -13,15 +12,9 @@ import paramGroups from './paramGroups';
  */
 
 describe(path.basename(__filename).replace('.test.js', ''), () => {
-    let sandbox;
-    beforeEach(() => {
-        sandbox = sinon.sandbox.create();
-    });
-
     afterEach(() => {
-        sandbox.restore();
         // @ts-ignore
-        doctopus.options = {};
+        doctopus.options = {}; // eslint-disable-line
         Object.keys(paramGroups).forEach((x) => {
             delete paramGroups[x];
         });

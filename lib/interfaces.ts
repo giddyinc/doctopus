@@ -1,6 +1,6 @@
 
 import { SchemaBuilder, Doc } from '.';
-import { Schema, Header, Parameter } from 'swagger-schema-official';
+import type { Schema, Header, Parameter } from 'swagger-schema-official';
 
 export interface IResponse {
     description: string;
@@ -47,6 +47,6 @@ export interface IProperties {
     [propertyName: string]: IExtendedSchema;
 }
 
-export interface IExtendedSchema extends Schema {
+export interface IExtendedSchema extends Omit<Schema, 'type'> {
     type?: string;
 }
