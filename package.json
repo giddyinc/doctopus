@@ -56,7 +56,7 @@
         "test": "nyc --reporter=text --reporter=html --reporter=lcov mocha lib/**/*.test.ts test/**/*.ts",
         "test:watch": "tsc --watch",
         "coverage": "nyc report --reporter=text-lcov | coveralls",
-        "build": "tsc",
+        "build": "tsc --project tsconfig.publish.json",
         "clean": "rm -rf dist"
     },
     "dependencies": {

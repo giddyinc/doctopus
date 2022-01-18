@@ -1,0 +1,12 @@
+{
+    "extends": "./tsconfig.base.json",
+    "compilerOptions": {
+        "rootDir": ".",
+        "baseUrl": ".",
+        "typeRoots": ["./node_modules/@types", "./typings"],
+        "moduleResolution": "node",
+        "declaration": true,
+    },
+    "include": ["lib/**/*", "lib/**/*.json", "./typings/**/*"],
+    "exclude": ["node_modules", "build", "scripts", "lib/**/*.test.ts"]
+}
