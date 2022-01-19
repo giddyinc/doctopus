@@ -1,5 +1,6 @@
 // Place your settings in this file to overwrite default and user settings.
 {
+  "editor.tabSize": 4,
   "search.exclude": {
     "**/node_modules": true,
     "dist/**": true,
@@ -10,5 +11,6 @@
       ".gitattributes": true,
       "LICENSE": true,
       "coverage": true
-  }
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

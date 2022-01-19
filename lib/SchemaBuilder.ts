@@ -1,124 +1,125 @@
 
-import { Schema, XML, ExternalDocs, Response, BodyParameter } from 'swagger-schema-official';
+import type { Schema, XML, ExternalDocs, Response, BodyParameter } from 'swagger-schema-official';
 import autoBind from 'auto-bind';
 import { isString } from 'util';
 import { IProperties } from './interfaces';
 
 export class SchemaBuilder {
-  constructor(private _schema: Schema = {}) {
-    autoBind(this);
-  }
-
-  public build(): Schema {
-    return this._schema;
-  }
-
-  public asParameter(props: string | { name: string, required?: boolean, description?: string }): BodyParameter {
-    if (isString(props)) {
-      const param: BodyParameter = {
-        in: 'body',
-        name: props,
-        schema: this._schema,
-      };
-      const { description } = this._schema;
-      if (description) {
-        param.description = description;
-      }
-      // console.log('schema', this._schema);
-      // console.log('param', param);
-      return param;
+    constructor(private _schema: Schema = {}) {
+        autoBind(this);
     }
 
-    const {
-      description = this._schema.description,
-      required = false,
-      name
-    } = props;
-
-    const param: BodyParameter = {
-      in: 'body',
-      name,
-      required,
-      schema: this._schema
-    };
-
-    if (description) {
-      param.description = description;
+    public build(): Schema {
+        return this._schema;
     }
 
-    // console.log(param);
-    return param;
-  }
+    public asParameter(props: string | { name: string, required?: boolean, description?: string }): BodyParameter {
+        if (isString(props)) {
+            const param: BodyParameter = {
+                in: 'body',
+                name: props,
+                schema: this._schema,
+            };
+            const { description } = this._schema;
+            if (description) {
+                param.description = description;
+            }
+            // console.log('schema', this._schema);
+            // console.log('param', param);
+            return param;
+        }
 
-  public asParam(props: string | { name: string, required?: boolean, description?: string }) {
-    return this.asParameter(props);
-  }
+        const {
+            description = this._schema.description,
+            required = false,
+            name,
+        } = props;
 
-  public toSchema(): Schema {
-    return this.build();
-  }
+        const param: BodyParameter = {
+            in: 'body',
+            name,
+            required,
+            schema: this._schema,
+        };
 
-  public asSchema(): Schema {
-    return this.build();
-  }
+        if (description) {
+            param.description = description;
+        }
 
-  public asResponse(description: string = 'Response'): Response {
-    const schema = this.build();
-    return {
-      description,
-      schema
-    };
-  }
+        // console.log(param);
+        return param;
+    }
 
-  /**
+    public asParam(props: string | { name: string, required?: boolean, description?: string }) {
+        return this.asParameter(props);
+    }
+
+    public toSchema(): Schema {
+        return this.build();
+    }
+
+    public asSchema(): Schema {
+        return this.build();
+    }
+
+    public asResponse(description: string = 'Response'): Response {
+        const schema = this.build();
+        return {
+            description,
+            schema,
+        };
+    }
+
+    /**
    * Set the fields of the schema that are required.
    * @memberof SchemaBuilder
    */
-  public requiredFields(fields: string[] | string = []): this {
-    const { _schema: schema } = this;
-    if (!Array.isArray(fields)) {
-      fields = [fields];
+    public requiredFields(fields: string[] | string = []): this {
+        const { _schema: schema } = this;
+        if (!Array.isArray(fields)) {
+            fields = [fields];
+        }
+        schema.required = fields;
+        return this;
     }
-    schema.required = fields;
-    return this;
-  }
 
-  public required(fields: string[] | string = []): this {
-    return this.requiredFields(fields);
-  }
+    public required(fields: string[] | string = []): this {
+        return this.requiredFields(fields);
+    }
 
-  public nullable(setting: boolean = true): this {
-    (this._schema as any).nullable = setting;
-    return this;
-  }
+    public nullable(setting: boolean = true): this {
+        (this._schema as any).nullable = setting;
+        return this;
+    }
 
-  public readOnly(setting: boolean = true): this {
-    this._schema.readOnly = setting;
-    return this;
-  }
+    public readOnly(setting: boolean = true): this {
+        this._schema.readOnly = setting;
+        return this;
+    }
 
-  public schema(schema: Schema): this {
-    this._schema = {
-      ...this._schema,
-      ...schema
-    };
-    return this;
-  }
+    public schema(schema: Schema): this {
+        this._schema = {
+            ...this._schema,
+            ...schema,
+        };
+        return this;
+    }
 
-  public uniqueItems(value: boolean = true): this {
-    this._schema.uniqueItems = value;
-    return this;
-  }
-  public ref($ref: string): this {
-    this._schema.$ref = $ref;
-    return this;
-  }
+    public uniqueItems(value: boolean = true): this {
+        this._schema.uniqueItems = value;
+        return this;
+    }
 
-  public example(example: { [exampleName: string]: {} }): this {
-    const { _schema } = this;
-    this._schema.example = { ...{}, ..._schema.example, ...example };
-    return this;
-  }
+    public ref($ref: string): this {
+        this._schema.$ref = $ref;
+        return this;
+    }
+
+    public example(example: { [exampleName: string]: {} }): this {
+        const { _schema } = this;
+        this._schema.example = { ...{}, ..._schema.example, ...example };
+        return this;
+    }
 
 
   public minItems!: (value: number) => this;
@@ -159,42 +160,42 @@ export class SchemaBuilder {
 }
 
 const minMaxProps = [
-  'Properties',
-  'Length',
-  'Items'
+    'Properties',
+    'Length',
+    'Items',
 ];
 
 const dynamicProps = [
-  'format',
-  'title',
-  'description',
-  'default',
-  'multipleOf',
-  'maximum',
-  'minimum',
-  'exclusiveMaximum',
-  'exclusiveMinimum',
-  'pattern',
-  'enum',
-  'type',
-  'items',
-  'allOf',
-  'additionalProperties',
-  'properties',
-  'discriminator',
-  'xml',
-  'externalDocs',
+    'format',
+    'title',
+    'description',
+    'default',
+    'multipleOf',
+    'maximum',
+    'minimum',
+    'exclusiveMaximum',
+    'exclusiveMinimum',
+    'pattern',
+    'enum',
+    'type',
+    'items',
+    'allOf',
+    'additionalProperties',
+    'properties',
+    'discriminator',
+    'xml',
+    'externalDocs',
 
-  ...minMaxProps.reduce((all: string[], p: string) => {
-    all.push(`min${p}`);
-    all.push(`max${p}`);
-    return all;
-  }, []),
+    ...minMaxProps.reduce((all: string[], p: string) => {
+        all.push(`min${p}`);
+        all.push(`max${p}`);
+        return all;
+    }, []),
 ];
 
 dynamicProps.forEach((prop: string) => {
-  SchemaBuilder.prototype[prop] = function(value: any) {
-    (this as any)._schema[prop] = value;
-    return this;
-  };
+    SchemaBuilder.prototype[prop] = function(value: any) {
+        (this as any)._schema[prop] = value;
+        return this;
+    };
 });

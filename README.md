@@ -1,7 +1,7 @@
 
 [![NPM version][npm-image]][npm-url]
 [![Build Status][travis-image]][travis-url]
-[![Dependency Status][daviddm-image]][daviddm-url]
+<!-- [![Dependency Status][daviddm-image]][daviddm-url] -->
 [![codecov](https://codecov.io/gh/giddyinc/doctopus/branch/master/graph/badge.svg)](https://codecov.io/gh/giddyinc/doctopus)
 
 # doctopus
@@ -12,7 +12,7 @@ Nobody likes writing docs. So to make it better, we wrote doctopus; a fluent plu
 
 The doctopus API provides heavy syntactic sugar over Swagger enabling re-use of common libraries and components for documentation composition.
 
-When used in conjuction with sister libraries doctopus faciliates schema reuse for persistence, validation, and documentation reducing maintenance overhead and increasing consistency.
+When used in conjunction with sister libraries doctopus faciliates schema reuse for persistence, validation, and documentation reducing maintenance overhead and increasing consistency.
 
 ## Overview
 

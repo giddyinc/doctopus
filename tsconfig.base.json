@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+        "outDir": "dist",
+        "module": "commonjs",
+        "target": "es2017",
+        "lib": [
+          "es2017",
+          "dom",
+          "esnext"
+        ],
+        "sourceMap": true,
+        "allowJs": false,
+        "moduleResolution": "node",
+        "forceConsistentCasingInFileNames": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noImplicitAny": false,
+        "strictNullChecks": false,
+        "suppressImplicitAnyIndexErrors": true,
+        "allowUnusedLabels": true,
+        "noStrictGenericChecks": true,
+        "experimentalDecorators": true,
+        "alwaysStrict": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "resolveJsonModule": true
+      }
+}

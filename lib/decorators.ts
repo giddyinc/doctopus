@@ -1,5 +1,5 @@
 
-import { Response, Parameter } from 'swagger-schema-official';
+import type { Response, Parameter } from 'swagger-schema-official';
 
 const namespaceKey = '__docs';
 // const namespaceKey = Symbol('__doctopus');
@@ -16,7 +16,7 @@ const initDocs = (target: any) => {
         Reflect.defineProperty(target[namespaceKey], 'clear', {
             value: clearDocs(target),
             enumerable: false,
-            writable: false
+            writable: false,
         });
     }
 };
