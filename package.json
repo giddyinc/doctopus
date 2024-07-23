@@ -1,6 +1,6 @@
 {
     "name": "@boxed/doctopus",
-    "version": "1.3.4",
+    "version": "1.3.5",
     "description": "Fluent & Pluggable Swagger Specification Builder",
     "homepage": "",
     "author": {
@@ -46,7 +46,7 @@
         "nyc": "15.1.0",
         "sinon": "12.0.1",
         "source-map-support": "0.5.12",
-        "ts-node": "10.4.0",
+        "ts-node": "^10.9.2",
         "typescript": "4.5.4"
     },
     "repository": "giddyinc/doctopus",
